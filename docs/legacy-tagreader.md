@@ -24,14 +24,14 @@ To build your own tag reader, you need the following components:
  - [WS2812](https://s.click.aliexpress.com/e/_d82GRqr)
  - [Buzzer](https://s.click.aliexpress.com/e/_dZ5F5yj)
 
-The 3D models for the case are [here](STLs).
+The 3D models for the case are [here](../STLs).
 
 ~~**WARNING** regarding AZdelivery D1. We have had several users contacting us with different issues, we don't recommend using these boards and won't provide support for them.~~
 Recent reports suggest more clones of the D1 are now working as expected. This has been verified on an AZdelivery D1.
 
 ### Connecting the components
 
-![Photo of schematics](Schematics/tag_reader_schematics_v3.2.png)
+![Photo of schematics](../Schematics/tag_reader_schematics_v3.2.png)
 
 There are not too many components to connect, but it does require soldering. You will need the following:
 
