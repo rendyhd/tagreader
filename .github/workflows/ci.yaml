@@ -1,35 +1,49 @@
-name: CI
+name: Movie Time checks
 
 on:
+  push:
   pull_request:
-  
+
+permissions:
+  contents: read
+
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  group: movie-time-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-  
+
 jobs:
-  ci:
-    name: Building ${{ matrix.file }} / ${{ matrix.esphome-version }}
+  reader:
+    name: Reader state and parser
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - run: g++ -std=c++17 -Wall -Wextra -Werror -fsanitize=address,undefined -g tests/test_reader.cpp -o /tmp/test-reader
+      - run: /tmp/test-reader
+
+  firmware:
+    name: ESPHome 2026.8.2 / original D1 mini
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install esphome==2026.8.2
+      - run: python tests/prepare_compile.py
+      - run: esphome compile .test-build/movie-player.yaml
+      # The compiled test binary contains dummy credentials and is not distributed.
+
+  home-assistant:
+    name: Home Assistant ${{ matrix.version }} / Kodi automation
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 3
       matrix:
-        #### Modify below here to match your project ####
-        file:
-          - tagreader
-        esphome-version:
-          - stable
-          - beta
-          - dev
-        #### Modify above here to match your project ####
-
-    
+        version: ['2026.8.0', '2026.9.1']
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4.2.2
-      - name: ESPHome ${{ matrix.esphome-version }}
-        uses: esphome/build-action@v6.0.0
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-python@v5
         with:
-          yaml-file: ${{ matrix.file }}.yaml
-          version: ${{ matrix.esphome-version }}
+          python-version: '3.14'
+      - run: python -m pip install homeassistant==${{ matrix.version }} pytest==9.1.1 pytest-asyncio==1.4.0
+      - run: python -m pytest -q tests/test_home_assistant.py

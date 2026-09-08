@@ -1,0 +1,258 @@
+# Movie Time: use this file instead of adding the old movie_buttons.yaml package.
+# Tested toolchain: ESPHome 2026.8.2. Copy secrets.example.yaml to secrets.yaml.
+substitutions:
+  name: movie-time
+  friendly_name: Movie Time
+  insertion_delay_ms: "300"
+  removal_delay_ms: "1500"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: false
+  min_version: 2026.8.2
+  project:
+    name: rendyhd.movie_time
+    version: "1.0.0"
+  includes:
+    - movie_reader.h
+
+esp8266:
+  board: d1_mini
+  framework:
+    version: 3.1.2
+  restore_from_flash: true
+
+preferences:
+  flash_write_interval: 5min
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  power_save_mode: none
+
+logger:
+  level: INFO
+
+api:
+  encryption:
+    key: !secret movie_time_api_key
+  # Short button taps must not be coalesced into a single released state.
+  batch_delay: 0ms
+  max_connections: 3
+  # HA outages do not cause periodic restarts or night-time startup beeps.
+  reboot_timeout: 0s
+
+ota:
+  - platform: esphome
+    password: !secret movie_time_ota_password
+
+i2c:
+  sda: D2
+  scl: D1
+  frequency: 100kHz
+  scan: true
+
+globals:
+  - id: movie_ready
+    type: bool
+    restore_value: false
+    initial_value: "false"
+
+pn532_i2c:
+  id: pn532_board
+  address: 0x24
+  update_interval: 500ms
+  on_tag:
+    # One synchronous action: do not retain/copy NfcTag through delayed actions.
+    - lambda: |-
+        std::string selected = x;
+        if (tag.has_ndef_message()) {
+          const auto &records = tag.get_ndef_message()->get_records();
+          for (const auto &record : records) {
+            const auto parsed = movie_time::ha_tag_id(record->get_type(), record->get_payload());
+            if (!parsed.empty()) {
+              selected = parsed;
+              break;
+            }
+          }
+        }
+        movie_time::reader().seen(x, selected, millis());
+  on_tag_removed:
+    - lambda: movie_time::reader().removed(x, millis());
+
+interval:
+  - interval: 100ms
+    then:
+      - lambda: |-
+          const uint32_t now = millis();
+          // Request failures can bypass PN532's on_tag_removed callback.
+          movie_time::reader().fault(id(pn532_board).is_failed() || id(pn532_board).status_has_warning(), now);
+          movie_time::reader().tick(now, ${insertion_delay_ms}, ${removal_delay_ms});
+          if (!id(movie_ready)) {
+            if (now < 3000) return;
+            id(movie_ready) = true;
+          }
+          const auto &selected = movie_time::reader().selected_id();
+          if (!id(selected_tag).has_state() || id(selected_tag).state != selected) {
+            const bool had_state = id(selected_tag).has_state();
+            id(selected_tag).publish_state(selected);
+            ESP_LOGI("movie_time", "Selected tag: %s", selected.empty() ? "[no case]" : selected.c_str());
+            if (had_state && !selected.empty()) id(read_feedback).execute();
+          }
+          const auto &uid = movie_time::reader().selected_uid();
+          if (!id(selected_uid).has_state() || id(selected_uid).state != uid)
+            id(selected_uid).publish_state(uid);
+
+text_sensor:
+  - platform: template
+    id: selected_tag
+    name: Selected Tag
+    icon: mdi:movie-open
+    update_interval: never
+  - platform: template
+    id: selected_uid
+    name: Selected UID
+    entity_category: diagnostic
+    update_interval: never
+  - platform: wifi_info
+    ip_address:
+      name: IP Address
+      entity_category: diagnostic
+
+binary_sensor:
+  - platform: gpio
+    id: play_button
+    name: Play Button
+    pin:
+      number: D5
+      mode: INPUT_PULLUP
+      inverted: true
+    filters:
+      - delayed_on: 30ms
+      - delayed_off: 100ms
+  - platform: gpio
+    id: pause_button
+    name: Pause Button
+    pin:
+      number: D6
+      mode: INPUT_PULLUP
+      inverted: true
+    filters:
+      - delayed_on: 30ms
+      - delayed_off: 100ms
+  - platform: gpio
+    id: stop_button
+    name: Stop Button
+    use_interrupt: false
+    pin:
+      number: D0
+      mode: INPUT
+      inverted: true
+    # D0 needs the physical 10 kΩ resistor to 3V3; it has no internal pull-up.
+    filters:
+      - delayed_on: 30ms
+      - delayed_off: 100ms
+  - platform: template
+    name: Reader Healthy
+    entity_category: diagnostic
+    lambda: return !id(pn532_board).is_failed() && !id(pn532_board).status_has_warning();
+  - platform: status
+    name: Online
+
+sensor:
+  - platform: wifi_signal
+    name: WiFi Signal
+    update_interval: 60s
+    entity_category: diagnostic
+  - platform: uptime
+    name: Uptime
+    update_interval: 60s
+    entity_category: diagnostic
+  - platform: template
+    name: Free Heap
+    lambda: return ESP.getFreeHeap();
+    unit_of_measurement: B
+    accuracy_decimals: 0
+    entity_category: diagnostic
+    update_interval: 60s
+
+switch:
+  - platform: template
+    id: buzzer_enabled
+    name: Buzzer Enabled
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+  - platform: template
+    id: led_enabled
+    name: LED Enabled
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+    on_turn_off:
+      - light.turn_off: activity_led
+
+output:
+  - platform: esp8266_pwm
+    id: buzzer_output
+    pin: D7
+
+rtttl:
+  id: buzzer
+  output: buzzer_output
+  gain: 50%
+
+light:
+  - platform: neopixelbus
+    id: activity_led
+    name: Status LED
+    variant: WS2812
+    type: GRB
+    pin: D8
+    method: bit_bang
+    num_leds: 1
+    default_transition_length: 0s
+    restore_mode: ALWAYS_OFF
+
+script:
+  - id: read_feedback
+    mode: restart
+    then:
+      - if:
+          condition:
+            switch.is_on: led_enabled
+          then:
+            - light.turn_on:
+                id: activity_led
+                brightness: 25%
+                red: 0%
+                green: 60%
+                blue: 100%
+                flash_length: 250ms
+      - if:
+          condition:
+            switch.is_on: buzzer_enabled
+          then:
+            - rtttl.play: "read:d=16,o=5,b=150:c,e"
+
+button:
+  - platform: template
+    name: Test LED
+    entity_category: diagnostic
+    on_press:
+      - light.turn_on:
+          id: activity_led
+          brightness: 25%
+          red: 0%
+          green: 100%
+          blue: 0%
+          flash_length: 1s
+  - platform: template
+    name: Test Buzzer
+    entity_category: diagnostic
+    on_press:
+      - rtttl.play: "test:d=8,o=5,b=120:c,e,g"
+  - platform: restart
+    name: Restart
+    entity_category: diagnostic
