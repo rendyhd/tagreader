@@ -3,7 +3,7 @@
 substitutions:
   name: movie-time
   friendly_name: Movie Time
-  insertion_delay_ms: "300"
+  insertion_delay_ms: "150"
   removal_delay_ms: "1500"
 
 esphome:
@@ -62,7 +62,7 @@ globals:
 pn532_i2c:
   id: pn532_board
   address: 0x24
-  update_interval: 500ms
+  update_interval: 250ms
   on_tag:
     # One synchronous action: do not retain/copy NfcTag through delayed actions.
     - lambda: |-
