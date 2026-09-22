@@ -1,0 +1,51 @@
+{
+  "review_date": "2026-09-08",
+  "base_commit": "a8bb6fc43e5a687503d1b43edb32855d0de7050a",
+  "issues_inventoried": 179,
+  "open_issues_triaged": 42,
+  "open_pull_requests_reviewed": 6,
+  "esphome_version": "2026.8.2",
+  "esp8266_arduino_version": "3.1.2",
+  "firmware_compiled": true,
+  "movie_firmware": {
+    "ram_used_bytes": 35964,
+    "ram_available_bytes": 81920,
+    "flash_used_bytes": 479447,
+    "flash_available_bytes": 1044464
+  },
+  "upstream_baseline": {
+    "ram_used_bytes": 37144,
+    "ram_available_bytes": 81920,
+    "flash_used_bytes": 459973,
+    "flash_available_bytes": 1044464
+  },
+  "memory_note": "Linker figures only; runtime heap, RF reliability and acoustic response require physical tests. Movie build includes API encryption; upstream baseline does not.",
+  "cpp_sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "cpp_insertion_removal_cycles": 10000,
+  "home_assistant_tests": {
+    "2026.9.1": {
+      "passed": 32,
+      "runner": "Home Assistant blueprint schemas, real script engine and triggers; simulated Kodi services"
+    },
+    "2026.8.0": {
+      "passed": 32,
+      "runner": "Home Assistant blueprint schemas, real script engine and triggers; simulated Kodi services"
+    }
+  },
+  "hardware_tested": false,
+  "device_flashed": false,
+  "live_home_assistant_modified": false,
+  "source_sha256": {
+    "movie-player.yaml": "a907f2f1da7fe19d04fad687a0d21ccd6d95256ee6f80ca2633d57b38b4325d4",
+    "movie_reader.h": "5e27c6c3fb423cb3fba0f4902f36336dc8ac082777b898c97b986aff3f7ce8e4",
+    "blueprints/MovieTimeKodi.yaml": "5318b71ac2edadd49c2c9239668575d708a281a4762f269b831fa0754075f350",
+    "tests/test_reader.cpp": "d958f5b534331bc3e1ca5c3ad09173c5c529df351d6c2d6bd4cd8c464ba90ae7",
+    "tests/test_home_assistant.py": "e693695ad210e31835fddd2f9756d8ecc6cb2314dcffced465203384f8214845",
+    "tests/prepare_compile.py": "5691206e3da57d2317f84bc3467bc0287e829274a3ea5e6d81c076afb2ae4aed",
+    "requirements-test.txt": "23a93b61f34ff5fac3063d3622abd3a31a6caf09b87bfa400e49ae7e7dfb209e",
+    ".github/workflows/ci.yaml": "7b6fe9b247c3b0ca0f4261676511ff100bd00f2cb3543daf522daadf0c1eb192"
+  }
+}

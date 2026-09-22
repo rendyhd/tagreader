@@ -1,67 +1,46 @@
-<a href="https://www.buymeacoffee.com/adonno" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-[![Discord](https://img.shields.io/discord/755394229944975380)](https://discord.gg/4SDcaRS)
-[![GitHub release](https://img.shields.io/github/release/adonno/tagreader.svg)](https://GitHub.com/adonno/tagreader/releases/)
+# Movie Time NFC player for Kodi
 
-# Tag Reader for Home Assistant
+A fork of [adonno/tagreader](https://github.com/adonno/tagreader) for a child’s
+DVD/Blu-ray case player. Insert a case to start its movie in Kodi through Home
+Assistant. Play, Pause and Stop work as labelled; removing the case stops playback.
 
-The tag reader is a simple to build/use NFC tag reader, specially created for [Home Assistant](https://www.home-assistant.io). It is using a D1 mini ESP 8266 and the PN532 NFC module. The firmware is built using [ESPhome](https://www.esphome.io).
+**Start with [the setup guide](docs/movie-time-setup.md).** It includes installation,
+movie mapping, wiring, recovery and the checks to perform on your assembled player.
 
-> I am selling a pre-built version, a DIY version (assembly required), or just the case (use with own components). Check it out on [my website](https://adonno-crafts.myshopify.com/).
+| File | Purpose |
+|---|---|
+| [movie-player.yaml](movie-player.yaml) | Firmware configuration for the original ESP8266 D1 mini |
+| [movie_reader.h](movie_reader.h) | Required reader logic; put it beside the YAML |
+| [secrets.example.yaml](secrets.example.yaml) | Copy/merge into your private ESPHome secrets file |
+| [MovieTimeKodi blueprint](blueprints/MovieTimeKodi.yaml) | Select your reader, buttons and Kodi in Home Assistant |
+| [Review and issue triage](docs/movie-time-review.md) | What was reviewed, addressed and still needs hardware testing |
 
-![Photos of the final product](docs/cases.jpg)
+The wiring is unchanged: PN532 on D1/D2, LED on D8, passive buzzer on D7,
+Play on D5, Pause on D6, Stop on D0 with its external 10 kΩ pull-up to 3V3.
 
-## Building the tag reader
+This version reads existing Home Assistant tag IDs and ordinary tag UIDs. It uses
+persistent entity states, debounces case removal, preserves mute preferences and
+avoids automatic playback on reconnect. Music-provider URL routing and tag writing
+are absent from the movie firmware. The original `tagreader.yaml` remains for
+reference and rollback; [its legacy instructions](docs/legacy-tagreader.md) do
+not describe the movie player.
 
-To build your own tag reader, you need the following components:
+The tested firmware toolchain is **ESPHome 2026.8.2 / ESP8266 Arduino 3.1.2**.
+Home Assistant tests execute the real blueprint with simulated Kodi responses.
+Automated validation cannot certify your physical NFC reception, buzzer, wiring
+or movie library: finish the bench checks in the setup guide before final assembly.
 
- - [ESP8266 D1 Mini](https://s.click.aliexpress.com/e/_d8l72oB)  
- - [PN532 NFC Reader](https://s.click.aliexpress.com/e/_dZNORIJ)
- - [WS2812](https://s.click.aliexpress.com/e/_d82GRqr)
- - [Buzzer](https://s.click.aliexpress.com/e/_dZ5F5yj)
+## Development checks
 
-The 3D models for the case are [here](STLs).
+```sh
+clang++ -std=c++17 -Wall -Wextra -Werror -fsanitize=address,undefined tests/test_reader.cpp -o /tmp/movie-reader-test
+/tmp/movie-reader-test
+python -m pytest -q tests/test_home_assistant.py
+python tests/prepare_compile.py
+esphome compile .test-build/movie-player.yaml
+```
 
-~~**WARNING** regarding AZdelivery D1. We have had several users contacting us with different issues, we don't recommend using these boards and won't provide support for them.~~  
-Recent reports suggest more clones of the D1 are now working as expected. This has been verified on an AZdelivery D1.
-
-### Connecting the components
-
-![Photo of schematics](Schematics/tag_reader_schematics_v3.2.png)
-
-There are not too many components to connect, but it does require soldering. You will need the following:
-
-- [Solder](https://s.click.aliexpress.com/e/_dT3S62j)
-- [Soldering iron with a fairly thin tip](https://s.click.aliexpress.com/e/_dXaI6nz)
-- [About 40cm of thin wire (at least 5 different colors)](https://s.click.aliexpress.com/e/_dZvoYoB)
-
-
-Also, make sure that you have set the switches on the PN532 to the following:
-- Switch 1: On (up)
-- Switch 2: Off (down)
-
-This enables the PN532 module to communicate with the D1 over I2C, and is required for the modules to work together!
-
-To flash the reader firmware to your D1 Mini you point ESPHome at [tagreader.yaml](tagreader.yaml).  
-> :warning: The tag reader requires ESPHome `1.16.0`.
-
-If you're new to ESPHome, we recommend that you use the [ESPHome Home Assistant add-on](https://esphome.io/guides/getting_started_hassio.html).
-
-![Open Case](docs/inside-case-completed.jpg)
-
-## Configuring for use with Home Assistant
-
-The tag reader requires [Home Assistant](https://www.home-assistant.io) 0.115 or later.
-
-If the tag reader is unable to connect to a wifi network, it will start a WiFi access point with a captive portal to allow you to enter your WiFi credentials.
-
-The tag reader will be automatically discovered by Home Assistant once the tag reader is connected to the same network. You can follow the instructions in the UI to set it up.
-
-## Usage
-
-Scanned tags can be managed from the tags interface in Home Assistant. You can find it under config -> tags.
-
-![Screenshot of the Home Assistant tag UI](docs/tag-ui.gif)
-
-## Disclamer
-
-We use aliexpress affiliate links for the components and the tools. Some Ad-blockers might block these links and thus they seem to appear broken. You will have to temporarily disable the ad-blocker to open these links. 
+For the Home Assistant tests use Python 3.14.2+ and `requirements-test.txt`.
+Install ESPHome 2026.8.2 in a separate Python 3.12 environment. The compile helper
+creates an isolated build using dummy credentials; never flash that test binary.
+Original project attribution and GPL licensing are retained in [LICENSE](LICENSE).

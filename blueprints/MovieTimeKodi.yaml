@@ -1,0 +1,215 @@
+blueprint:
+  name: Movie Time — cases and buttons for Kodi
+  description: >-
+    Insert a mapped case to start its movie. Play resumes, or starts the selected
+    movie after Stop. Pause pauses. Stop, removal or a reader outage stops only
+    the session this automation started. Reconnection never automatically starts
+    a movie. Create one Text helper (maximum length 128) to remember the active
+    session; select it below. Use movie-player.yaml, not the legacy firmware.
+  domain: automation
+  homeassistant:
+    min_version: 2026.8.0
+  input:
+    tag_sensor:
+      name: Movie Time — Selected Tag
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+              integration: esphome
+    play_button:
+      name: Movie Time — Play Button
+      selector:
+        entity:
+          filter:
+            - domain: binary_sensor
+              integration: esphome
+    pause_button:
+      name: Movie Time — Pause Button
+      selector:
+        entity:
+          filter:
+            - domain: binary_sensor
+              integration: esphome
+    stop_button:
+      name: Movie Time — Stop Button
+      selector:
+        entity:
+          filter:
+            - domain: binary_sensor
+              integration: esphome
+    kodi_player:
+      name: Kodi player
+      selector:
+        entity:
+          filter:
+            - domain: media_player
+              integration: kodi
+    session_helper:
+      name: Active movie — Text helper
+      description: Create a dedicated Text helper with maximum length 128. Leave it empty.
+      selector:
+        entity:
+          filter:
+            - domain: input_text
+    movies:
+      name: Tag IDs and movies
+      description: >-
+        Map each Selected Tag value to either {movieid: 123} for a Kodi library
+        movie, or {file: "smb://server/movies/movie.mkv"} for a path Kodi can play.
+        An optional title is for your reference. These are examples: replace them.
+      default: {}
+      selector:
+        object: {}
+
+# Queue actual player calls so a quick removal cannot overtake an in-flight open.
+# Selection and button commands are rechecked against current state on execution.
+mode: queued
+max: 20
+max_exceeded: warning
+
+triggers:
+  - trigger: state
+    entity_id: !input tag_sensor
+    not_to:
+      - unavailable
+      - unknown
+    id: selection
+  - trigger: state
+    entity_id: !input tag_sensor
+    to: unavailable
+    for: "00:00:03"
+    id: offline
+  - trigger: state
+    entity_id: !input play_button
+    from: "off"
+    to: "on"
+    id: play
+  - trigger: state
+    entity_id: !input pause_button
+    from: "off"
+    to: "on"
+    id: pause
+  - trigger: state
+    entity_id: !input stop_button
+    from: "off"
+    to: "on"
+    id: stop
+  - trigger: homeassistant
+    event: start
+    id: startup
+  - trigger: state
+    entity_id: !input kodi_player
+    from:
+      - unavailable
+      - unknown
+      - "off"
+    not_to:
+      - unavailable
+      - unknown
+    id: kodi_reconnected
+  - trigger: event
+    event_type: kodi_call_method_result
+    event_data:
+      entity_id: !input kodi_player
+      result_ok: false
+      input:
+        method: Player.Open
+    id: open_error
+
+actions:
+  - variables:
+      tag_entity: !input tag_sensor
+      player_entity: !input kodi_player
+      session_entity: !input session_helper
+      movies: !input movies
+  - variables:
+      current_tag: "{{ states(tag_entity) }}"
+      active_tag: "{{ states(session_entity) }}"
+      player_state: "{{ states(player_entity) }}"
+  - variables:
+      movie: "{{ movies.get(current_tag, {}) if movies is mapping else {} }}"
+      active_movie: "{{ movies.get(active_tag, {}) if movies is mapping else {} }}"
+      has_session: "{{ active_tag not in ['', 'unknown', 'unavailable'] }}"
+  - variables:
+      valid_movie: >-
+        {{ movie is mapping and
+           ((movie.get('movieid') is integer and movie.get('movieid') is not boolean and movie.get('movieid') > 0)
+            or (movie.get('file') is string and movie.get('file') | length > 0)) }}
+      command: >-
+        {% if trigger.id == 'open_error' %}
+          {% set failed = trigger.event.data.get('input', {}).get('params', {}).get('item', {}) %}
+          {% set matches = active_movie is mapping and
+             ((failed.get('movieid') is not none and failed.get('movieid') == active_movie.get('movieid'))
+              or (failed.get('file') is not none and failed.get('file') == active_movie.get('file'))) %}
+          {{ 'stop' if has_session and matches else 'ignore' }}
+        {% elif trigger.id in ['stop', 'offline', 'startup', 'kodi_reconnected'] %}
+          {{ 'stop' if has_session else 'ignore' }}
+        {% elif current_tag in ['', 'unknown', 'unavailable'] or not valid_movie %}
+          {{ 'stop' if has_session else 'ignore' }}
+        {% elif trigger.id == 'pause' %}
+          {{ 'pause' if has_session and active_tag == current_tag and player_state == 'playing' else 'ignore' }}
+        {% elif trigger.id == 'play' %}
+          {% if has_session and active_tag == current_tag and player_state == 'paused' %}resume
+          {% elif has_session and active_tag == current_tag and player_state == 'playing' %}ignore
+          {% else %}open{% endif %}
+        {% elif trigger.id == 'selection' %}
+          {% if trigger.from_state is none or trigger.from_state.state in ['unknown', 'unavailable'] %}
+            {{ 'stop' if has_session and active_tag != current_tag else 'ignore' }}
+          {% elif trigger.to_state.state != current_tag or trigger.from_state.state == current_tag %}ignore
+          {% else %}open{% endif %}
+        {% else %}ignore{% endif %}
+  - choose:
+      - conditions: "{{ command | trim == 'stop' }}"
+        sequence:
+          # Kodi can swallow transport/protocol exceptions. Keep ownership until
+          # its state confirms idle, rather than assuming a returned call worked.
+          - condition: template
+            value_template: "{{ states(player_entity) not in ['unavailable', 'unknown', 'off'] }}"
+          - if: "{{ not is_state(player_entity, 'idle') }}"
+            then:
+              - action: media_player.media_stop
+                target:
+                  entity_id: "{{ player_entity }}"
+              - wait_template: "{{ is_state(player_entity, 'idle') }}"
+                timeout: "00:00:03"
+                continue_on_timeout: false
+          - action: input_text.set_value
+            target:
+              entity_id: "{{ session_entity }}"
+            data:
+              value: ""
+      - conditions: "{{ command | trim == 'pause' }}"
+        sequence:
+          - action: media_player.media_pause
+            target:
+              entity_id: "{{ player_entity }}"
+      - conditions: "{{ command | trim == 'resume' }}"
+        sequence:
+          - action: media_player.media_play
+            target:
+              entity_id: "{{ player_entity }}"
+      - conditions: "{{ command | trim == 'open' }}"
+        sequence:
+          - condition: template
+            value_template: "{{ player_state not in ['unavailable', 'unknown', 'off'] }}"
+          # Track the request before sending it: even if the connection drops
+          # during Player.Open, a later stop/reconnect can clean up this session.
+          - action: input_text.set_value
+            target:
+              entity_id: "{{ session_entity }}"
+            data:
+              value: "{{ current_tag }}"
+          - action: kodi.call_method
+            target:
+              entity_id: "{{ player_entity }}"
+            data:
+              method: Player.Open
+              item: >-
+                {% if movie.get('movieid') is integer and movie.get('movieid') is not boolean and movie.get('movieid') > 0 %}
+                  {{ {'movieid': movie.get('movieid')} }}
+                {% else %}
+                  {{ {'file': movie.get('file')} }}
+                {% endif %}
+              options:
+                resume: false
