@@ -26,6 +26,10 @@ int main() {
   assert(!r.tick(299));
   assert(r.tick(300));
   assert(r.selected_id() == "movie-a");
+  // Retain a tag's NDEF/HA ID if a later PN532 poll reports only its UID.
+  r.seen("01-02", "01-02", 400);
+  assert(!r.tick(1000));
+  assert(r.selected_id() == "movie-a");
   // A case stays selected indefinitely without repeated on_tag callbacks.
   assert(!r.tick(10000000));
   assert(r.selected_id() == "movie-a");

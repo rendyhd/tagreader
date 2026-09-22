@@ -31,6 +31,11 @@ class ReaderState {
   void seen(const std::string &uid, const std::string &id, uint32_t now) {
     if (!valid_id(uid) || !valid_id(id))
       return;
+    // Some PN532 reads expose only the UID after an earlier read exposed the
+    // tag's NDEF/HA ID.  Keep that richer ID while the same physical tag is
+    // still present, otherwise HA would alternate between two movie IDs.
+    if (uid == observed_uid_ && id == uid && observed_id_ != uid)
+      return;
     if (uid == observed_uid_ && id == observed_id_)
       return;
     observed_uid_ = uid;
