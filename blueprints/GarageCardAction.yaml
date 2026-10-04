@@ -1,0 +1,55 @@
+blueprint:
+  name: Garage card - assign door or script rights
+  description: >-
+    Assign one scanned card to one ESPHome reader and your chosen actions.
+    Scan and name the card in Settings > Tags first, then copy its exact tag ID.
+    Create another automation for another card or reader. Naming a card alone
+    grants no access. Disable this automation to revoke its rights.
+  domain: automation
+  input:
+    reader:
+      name: Card reader
+      description: Select the Garage Card Reader ESPHome device.
+      selector:
+        device:
+          filter:
+            - integration: esphome
+    card_id:
+      name: Card tag ID
+      description: Exact ID from Settings > Tags, for example wg34-12345678.
+      selector:
+        text: {}
+    access_conditions:
+      name: Conditions for access
+      description: Optional restrictions such as hours or a guest-access helper.
+      default: []
+      selector:
+        condition: {}
+    granted_actions:
+      name: Actions permitted for this card
+      description: Open a door, open a gate, run a script, or choose several actions.
+      default: []
+      selector:
+        action: {}
+    cooldown:
+      name: Minimum time between actions
+      description: Scans during the actions and this extra cooldown are discarded.
+      default: 5
+      selector:
+        number:
+          min: 1
+          max: 60
+          unit_of_measurement: seconds
+          mode: box
+
+triggers:
+  - trigger: tag
+    tag_id: !input card_id
+    device_id: !input reader
+conditions: !input access_conditions
+actions:
+  - sequence: !input granted_actions
+  - delay:
+      seconds: !input cooldown
+mode: single
+max_exceeded: silent

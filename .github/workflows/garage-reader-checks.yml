@@ -1,0 +1,38 @@
+name: Garage reader checks
+on:
+  push:
+    branches: [codex/garage-gate-reader]
+  pull_request:
+    paths:
+      - 'garage*'
+      - 'blueprints/GarageCardAction.yaml'
+      - 'tests/*garage*'
+      - '.github/workflows/garage-reader-checks.yml'
+permissions:
+  contents: read
+jobs:
+  scan-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - run: g++ -std=c++17 -Wall -Wextra -Werror -fsanitize=address,undefined tests/test_garage_reader.cpp -o /tmp/garage-test
+      - run: /tmp/garage-test
+  firmware:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install esphome==2026.8.2
+      - run: python tests/prepare_garage_compile.py
+      - run: esphome compile .test-build/garage/garage-reader.yaml
+  card-actions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - run: python -m pip install homeassistant==2026.9.1 pytest==9.1.1 pytest-asyncio==1.4.0
+      - run: python -m pytest -q tests/test_garage_home_assistant.py
