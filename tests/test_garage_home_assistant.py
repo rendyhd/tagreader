@@ -1,5 +1,6 @@
 """Execute the real HA tag trigger and blueprint actions, with mock door services."""
 import asyncio
+import logging
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -10,6 +11,7 @@ from homeassistant.components.automation.config import AUTOMATION_BLUEPRINT_SCHE
 from homeassistant.components.blueprint.models import Blueprint, BlueprintInputs
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.script import Script, async_validate_actions_config
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.trigger import async_setup as setup_triggers, async_validate_trigger_config, async_initialize_triggers
 from homeassistant.util.yaml import load_yaml
 
@@ -22,6 +24,8 @@ CARD = 'wg34-12345678'
 async def rig(tmp_path):
     hass = HomeAssistant(str(tmp_path))
     loader.async_setup(hass)
+    dr.async_setup(hass)
+    await dr.async_load(hass, load_empty=True)
     await setup_triggers(hass)
     bp = Blueprint(load_yaml(str(ROOT / 'blueprints/GarageCardAction.yaml')),
                    expected_domain='automation', schema=AUTOMATION_BLUEPRINT_SCHEMA)
@@ -52,7 +56,7 @@ async def rig(tmp_path):
         await script.async_run(variables, context=context)
 
     remove = await async_initialize_triggers(hass, config['triggers'], action,
-        'automation', 'Card rights', lambda *args, **kwargs: None)
+        'automation', 'Card rights', logging.getLogger(__name__).log)
     assert remove is not None
 
     async def scan(card=CARD, reader=READER):
@@ -105,3 +109,4 @@ async def test_diagnostic_reconnect_state_never_triggers_access(rig):
     rig.hass.states.async_set('sensor.garage_card_reader_last_card', CARD)
     await rig.hass.async_block_till_done()
     assert rig.calls == []
+
