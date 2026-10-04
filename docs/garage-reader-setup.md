@@ -22,15 +22,41 @@ with the movie reader's PN532 are not necessarily compatible with this reader.
 
 ## Parts and wiring
 
-See [hardware research and conditional simpler wiring](garage-reader-hardware-research.md)
-for the ordered dual-frequency variant, the mainboard recommendation, and an
-assembled converter alternative if the reader's data signals are confirmed as 0–5 V.
+Use the [five-page printable wiring and soldering guide](../output/pdf/garage-reader-soldering-guide.pdf).
+It shows your exact D1 mini pads, both electrical circuits, component placement,
+the mirrored solder side, and the soldering sequence. It keeps your existing
+reader and controller. The new drawings use **USB power for the D1 mini and a
+separate fixed regulated 12 V adapter for the reader**, so an adjustable buck
+converter and a meter to set its output are not needed.
+
+The interface parts and reader power supply are **additional parts**; the two
+photographed devices alone are not the complete build. The input circuit is a
+proposed design for ordinary 0–12 V signals, not a measured specification of your
+reader or a bench-tested assembly. Having no meter does not establish that direct
+GPIO wiring or a 5 V-only converter would work.
 
 ![Wiring diagram](garage-reader-wiring.svg)
 
-Add a regulated 12 V DC supply sized to the reader's specified current plus the
-ESP8266, a 12 V-to-5 V buck converter rated for at least 500 mA output, and these
-parts **for each data line**:
+Add a **fixed regulated 12 V DC plug-in supply** for the reader. Its exact current
+rating is unknown; 12 V / 1 A is a conservative starting choice for this reader
+alone, not a verified minimum requirement. Use a barrel-to-screw adapter matching
+the supply connector and its marked polarity if needed. Do not cut into or assemble
+mains wiring. Power the D1 mini using a **5 V USB wall charger and USB-C cable**.
+Connect the DC grounds together as shown.
+
+For the complete two-channel interface, obtain:
+
+| Quantity | Part |
+|---|---|
+| 2 | 2N3904 NPN transistors, TO-92, documented E-B-C lead order |
+| 2 | 1N4148 axial diodes |
+| 4 | 10 kΩ resistors, 1/4 W |
+| 2 | 47 kΩ resistors, 1/4 W |
+| 2 | 100 kΩ resistors, 1/4 W |
+| 1 | Isolated-pad perfboard, 2.54 mm pitch, at least 24 columns × 20 rows; a 7 × 9 cm board is convenient |
+| As needed | Insulated hookup wire, solder, flux, heat-shrink and an indoor enclosure |
+
+These parts form the following circuit **for each data line**:
 
 - One 2N3904 NPN transistor (Q1/Q2).
 - One 47 kΩ resistor from reader data to base.
@@ -50,11 +76,91 @@ Both firmware inputs therefore require `inverted: true`. This proposed interface
 handles ordinary 0–12 V logic, including open-collector or driven outputs. It is
 not a certified outdoor lightning/surge isolator. Keep the GPIO wires short.
 
-Power reader red from 12 V and board **VBUS** from the buck's regulated 5 V.
-Connect black, both emitters, buck negative and board GND together. Board **3V3**
-supplies only the collector pull-ups. Never feed 12 V to VBUS, 3V3 or GPIO.
-For USB flashing, disconnect external 5 V from VBUS to avoid feeding two sources
-together. Reader 12 V may remain powered with common ground.
+Power reader red from the adapter's +12 V, and power the D1 mini through USB-C.
+The board's **VBUS pad supplies the interface's 5 V bias**; do not attach another
+5 V supply to VBUS while USB is connected. Connect adapter negative, reader black,
+reader brown, both emitters and board GND together. Board **3V3** supplies only the
+collector pull-ups. Never feed 12 V to VBUS, 3V3 or GPIO. For flashing, the USB cable
+can come from the computer instead of the USB wall charger; keep the common ground.
+
+## Detailed soldering layout
+
+The two circuits have identical parts but different reference numbers:
+
+| Use | Green / channel 1 | White / channel 2 |
+|---|---|---|
+| Input resistor | R1 47 kΩ | R5 47 kΩ |
+| Base-to-ground resistor | R2 100 kΩ | R6 100 kΩ |
+| Collector-to-3V3 resistor | R3 10 kΩ | R7 10 kΩ |
+| 5 V reader-line bias resistor | R4 10 kΩ | R8 10 kΩ |
+| Bias diode | D1 1N4148 | D2 1N4148 |
+| Transistor | Q1 2N3904 | Q2 2N3904 |
+
+Here **D1/D2 printed beside diodes are component references**, not the D1 mini's
+GPIO names. The diode stripe is the cathode. In the physical layout the stripes
+face holes **H2 and H12**. Resistors have no polarity.
+
+![Component-side placement](garage-reader-solder-top.svg)
+
+Use **isolated individual copper pads**, not stripboard with connected copper
+rows. Mark corner A1. Letters and row numbers refer to the component-side view;
+turn the board left-to-right with row 1 still at the top to obtain the mirrored
+solder-side view below. Insert each part into its named pair of holes. Solder and
+trim the leads, then add insulated wires on the copper side. Use short exposed
+wire ends; bare wires must not cross or touch unrelated pads.
+
+![Mirrored solder-side connections](garage-reader-solder-bottom.svg)
+
+Connect **all pads in each row of this table together**, and keep different rows
+electrically separate. The builder checks the pad groups against the circuit's
+component connections, but this cannot check your physical soldering.
+
+| Electrical group | Solder these pads together |
+|---|---|
+| USB 5 V bias | B2, D2, D12 |
+| 3V3 | V2, T4, T14 |
+| GND | V18, J6, L8, J16, L18 |
+| Reader D0 input / IN1 | B6, D4, N2 |
+| Q1 base | H4, K6, H8 |
+| Q1 collector / OUT1 | V6, L6, P4 |
+| D1 cathode to R4 | H2, J2 |
+| Reader D1 input / IN2 | B16, D14, N12 |
+| Q2 base | H14, K16, H18 |
+| Q2 collector / OUT2 | V16, L16, P14 |
+| D2 cathode to R8 | H12, J12 |
+
+External wires attach to these pads:
+
+| Perfboard pad | External connection |
+|---|---|
+| B2 | Board VBUS, fed by USB, for bias only |
+| V2 | Board 3V3 |
+| V18 | Common ground |
+| B6 | Reader green D0 |
+| B16 | Reader white D1 |
+| V6 | Board printed `5 SCL` / GPIO5 / board D1 |
+| V16 | Board printed `4 SDA` / GPIO4 / board D2 |
+
+Fit **Q1 emitter at J6, base at K6, collector at L6**, with its flat face toward
+row 7. Fit **Q2 emitter at J16, base at K16, collector at L16**, flat face toward
+row 17. This assumes the specified 2N3904 pin order; check the supplier's drawing
+before soldering. Do not substitute a BC547 without remapping its legs.
+
+Keep both supplies unplugged throughout soldering. Solder the D1 mini headers
+provided in your photos, or short insulated wires directly onto the named pads.
+Do not join adjacent header pads. Assemble the perfboard using the PDF's sequence,
+connect the external wires, and cover the blue/yellow reader wire ends separately.
+Mount the perfboard and D1 mini indoors on spacers with strain relief; the reader
+remains outside. The diagram does not provide weatherproofing for the controller
+or certified surge protection for a long outdoor cable.
+
+For **4-band** resistors with gold tolerance bands: 10 kΩ is brown-black-orange-gold,
+47 kΩ is yellow-violet-orange-gold, and 100 kΩ is brown-black-yellow-gold. A 5-band
+1% resistor has a different band pattern; use its supplier label rather than this
+4-band lookup.
+
+To rebuild the drawings and PDF, install `tools/requirements-wiring.txt`, then run
+`python tools/build_garage_wiring_guide.py`.
 
 No gate control wires connect to this reader. Home Assistant commands your
 existing gate/door controller. If you need a new controller, use a separate
@@ -130,12 +236,18 @@ another scan can recreate that entry. A card can have multiple rights automation
 
 ## Bench checks before enabling door actions
 
-1. Check soldering, ground continuity, transistor lead order and diode orientation
-   with power off. Adjust the buck to 5.0 V before attaching VBUS.
-2. With GPIOs disconnected, measure reader green/white against black. Idle levels
-   must be ordinary 0–12 V logic. Powered interface collectors should idle low
-   and never exceed 3.3 V. A scope/logic analyzer should show a rise toward 3.3 V
-   for every reader low pulse.
+1. With both supplies unplugged, compare every lead and pad group with the
+   drawings. Inspect both sides with good lighting and magnification for solder
+   bridges, touching bare leads and loose wire strands. Verify the adapter is
+   labelled regulated 12 V DC and match its polarity to the connector labels.
+   Use USB power for the D1 mini; no adjustable buck is needed.
+2. **If test equipment becomes available**, check ground continuity and supply
+   polarity first. With GPIOs disconnected, measure green/white against black;
+   the proposed circuit assumes ordinary 0–12 V logic. Powered collectors should
+   idle low and remain at or below 3.3 V. A scope/logic analyzer should show a
+   rise toward 3.3 V for each reader low pulse. Without equipment you cannot verify
+   these levels or detect every soldering fault by visual inspection. The guide
+   does not claim that the unmeasured reader or assembled interface is certified.
 3. Connect GPIOs. Strap brown to ground with power off, then reboot. A scan should
    show **Last Frame Bits = 34** and **Last Card = wg34-...**. If Bits updates
    but Last Card does not, check polarity/wiring/parity with temporary DEBUG logs.
@@ -174,6 +286,7 @@ cryptographic access control. Retain the gate's normal obstruction/safety contro
 - [Home Assistant Tags](https://www.home-assistant.io/integrations/tag/)
 - [Tag trigger and reader restriction](https://www.home-assistant.io/docs/automation/trigger/#tag-trigger)
 - [2N3904 ratings and pinout](https://www.onsemi.com/pdf/datasheet/2n3903-d.pdf)
+- [1N4148 diode identification and ratings](https://www.vishay.com/docs/81857/1n4148.pdf)
 
 Your sticker supplies the wire colors. The input circuit is a proposed design
 that still requires the physical checks above.

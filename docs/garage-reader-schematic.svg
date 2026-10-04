@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100">
+<rect width="1600" height="1100" fill="white"/>
+<text x="50" y="61" font-family="Arial,sans-serif" font-size="36" font-weight="bold" fill="#172e43" text-anchor="start">2. Electrical schematic - build both channels</text>
+<text x="50" y="102" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Every filled dot is a soldered junction. Crossing lines without a dot must stay electrically separate.</text>
+<polyline points="50,126 1550,126" fill="none" stroke="#cfdae3" stroke-width="2" stroke-linejoin="round" />
+<text x="50" y="1074" font-family="Arial,sans-serif" font-size="17" font-weight="normal" fill="#172e43" text-anchor="start">LOLIN D1 mini V4 / photographed Wiegand reader | proposed build; not bench-tested</text>
+<text x="1505" y="1074" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">2/5</text>
+<text x="55" y="178" font-family="Arial,sans-serif" font-size="25" font-weight="bold" fill="#172e43" text-anchor="start">CHANNEL 1: GREEN / reader D0</text>
+<text x="60" y="242" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#d26916" text-anchor="start">Board VBUS / USB 5 V</text>
+<polyline points="300,235 350,235" fill="none" stroke="#d26916" stroke-width="4" stroke-linejoin="round" />
+<rect x="350" y="222" width="90" height="26" rx="3" fill="#e39458" stroke="#172e43" stroke-width="2"/>
+<polyline points="422,221 422,249" fill="none" stroke="#172e43" stroke-width="6" stroke-linejoin="round" />
+<text x="395" y="200" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="middle">D1 1N4148</text>
+<text x="400" y="275" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="middle">Stripe toward resistor</text>
+<polyline points="440,235 470,235" fill="none" stroke="#172e43" stroke-width="4" stroke-linejoin="round" />
+<polyline points="470,235 650,235" fill="none" stroke="#172e43" stroke-width="3" stroke-linejoin="round" />
+<rect x="517.0" y="222" width="86" height="26" rx="4" fill="#f4deaf" stroke="#172e43" stroke-width="2"/>
+<text x="560.0" y="207" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="middle">R4  10k</text>
+<polyline points="650,235 685,235 685,355" fill="none" stroke="#17835d" stroke-width="4" stroke-linejoin="round" />
+<text x="55" y="387" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#17835d" text-anchor="start">Reader DATA</text>
+<polyline points="55,355 720,355" fill="none" stroke="#17835d" stroke-width="4" stroke-linejoin="round" />
+<circle cx="685" cy="355" r="6" fill="#17835d"/>
+<polyline points="720,355 905,355" fill="none" stroke="#172e43" stroke-width="3" stroke-linejoin="round" />
+<rect x="769.5" y="342" width="86" height="26" rx="4" fill="#f4deaf" stroke="#172e43" stroke-width="2"/>
+<text x="812.5" y="327" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="middle">R1  47k</text>
+<polyline points="905,355 1055,355" fill="none" stroke="#138fbc" stroke-width="4" stroke-linejoin="round" />
+<circle cx="965" cy="355" r="6" fill="#138fbc"/>
+<polyline points="965,390 965,490" fill="none" stroke="#172e43" stroke-width="3" stroke-linejoin="round" />
+<rect x="952" y="401.0" width="26" height="78" rx="4" fill="#f4deaf" stroke="#172e43" stroke-width="2"/>
+<text x="995" y="447.0" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="start">R2  100k</text>
+<polyline points="965,355 965,390" fill="none" stroke="#138fbc" stroke-width="4" stroke-linejoin="round" />
+<polyline points="965,490 965,515 1120,515" fill="none" stroke="#344454" stroke-width="4" stroke-linejoin="round" />
+<circle cx="1090" cy="355" r="53" fill="white" stroke="#172e43" stroke-width="2"/>
+<polyline points="1055,355 1070,355 1070,330 1070,380" fill="none" stroke="#172e43" stroke-width="4" stroke-linejoin="round" />
+<polyline points="1070,342 1120,305 1120,230" fill="none" stroke="#172e43" stroke-width="4" stroke-linejoin="round" />
+<polyline points="1070,368 1120,405 1120,515" fill="none" stroke="#344454" stroke-width="4" stroke-linejoin="round" />
+<polygon points="1118,405 1099,398 1110,387" fill="#172e43"/>
+<text x="1142" y="369" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="#172e43" text-anchor="start">Q1 2N3904</text>
+<text x="1030" y="367" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">B</text>
+<text x="1130" y="293" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">C</text>
+<text x="1130" y="447" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">E</text>
+<text x="1140" y="520" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#344454" text-anchor="start">GND</text>
+<circle cx="1120" cy="230" r="6" fill="#2760c5"/>
+<polyline points="1120,230 1505,230" fill="none" stroke="#2760c5" stroke-width="4" stroke-linejoin="round" />
+<text x="1160" y="257" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#2760c5" text-anchor="start">OUT1 -&gt; 5 SCL / GPIO5 / board D1</text>
+<polyline points="1190,230 1190,168 1230,168" fill="none" stroke="#a738a3" stroke-width="4" stroke-linejoin="round" />
+<polyline points="1230,168 1390,168" fill="none" stroke="#172e43" stroke-width="3" stroke-linejoin="round" />
+<rect x="1267.0" y="155" width="86" height="26" rx="4" fill="#f4deaf" stroke="#172e43" stroke-width="2"/>
+<text x="1310.0" y="140" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="middle">R3 10k</text>
+<polyline points="1390,168 1490,168" fill="none" stroke="#a738a3" stroke-width="4" stroke-linejoin="round" />
+<text x="1490" y="154" font-family="Arial,sans-serif" font-size="19" font-weight="normal" fill="#a738a3" text-anchor="end">Board 3V3</text>
+<circle cx="1190" cy="230" r="6" fill="#2760c5"/>
+<text x="55" y="588" font-family="Arial,sans-serif" font-size="25" font-weight="bold" fill="#172e43" text-anchor="start">CHANNEL 2: WHITE / reader D1</text>
+<text x="60" y="652" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#d26916" text-anchor="start">Board VBUS / USB 5 V</text>
+<polyline points="300,645 350,645" fill="none" stroke="#d26916" stroke-width="4" stroke-linejoin="round" />
+<rect x="350" y="632" width="90" height="26" rx="3" fill="#e39458" stroke="#172e43" stroke-width="2"/>
+<polyline points="422,631 422,659" fill="none" stroke="#172e43" stroke-width="6" stroke-linejoin="round" />
+<text x="395" y="610" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="middle">D2 1N4148</text>
+<text x="400" y="685" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="middle">Stripe toward resistor</text>
+<polyline points="440,645 470,645" fill="none" stroke="#172e43" stroke-width="4" stroke-linejoin="round" />
+<polyline points="470,645 650,645" fill="none" stroke="#172e43" stroke-width="3" stroke-linejoin="round" />
+<rect x="517.0" y="632" width="86" height="26" rx="4" fill="#f4deaf" stroke="#172e43" stroke-width="2"/>
+<text x="560.0" y="617" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="middle">R8  10k</text>
+<polyline points="650,645 685,645 685,765" fill="none" stroke="#52677b" stroke-width="4" stroke-linejoin="round" />
+<text x="55" y="797" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#52677b" text-anchor="start">Reader DATA</text>
+<polyline points="55,765 720,765" fill="none" stroke="#52677b" stroke-width="4" stroke-linejoin="round" />
+<circle cx="685" cy="765" r="6" fill="#52677b"/>
+<polyline points="720,765 905,765" fill="none" stroke="#172e43" stroke-width="3" stroke-linejoin="round" />
+<rect x="769.5" y="752" width="86" height="26" rx="4" fill="#f4deaf" stroke="#172e43" stroke-width="2"/>
+<text x="812.5" y="737" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="middle">R5  47k</text>
+<polyline points="905,765 1055,765" fill="none" stroke="#138fbc" stroke-width="4" stroke-linejoin="round" />
+<circle cx="965" cy="765" r="6" fill="#138fbc"/>
+<polyline points="965,800 965,900" fill="none" stroke="#172e43" stroke-width="3" stroke-linejoin="round" />
+<rect x="952" y="811.0" width="26" height="78" rx="4" fill="#f4deaf" stroke="#172e43" stroke-width="2"/>
+<text x="995" y="857.0" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="start">R6  100k</text>
+<polyline points="965,765 965,800" fill="none" stroke="#138fbc" stroke-width="4" stroke-linejoin="round" />
+<polyline points="965,900 965,925 1120,925" fill="none" stroke="#344454" stroke-width="4" stroke-linejoin="round" />
+<circle cx="1090" cy="765" r="53" fill="white" stroke="#172e43" stroke-width="2"/>
+<polyline points="1055,765 1070,765 1070,740 1070,790" fill="none" stroke="#172e43" stroke-width="4" stroke-linejoin="round" />
+<polyline points="1070,752 1120,715 1120,640" fill="none" stroke="#172e43" stroke-width="4" stroke-linejoin="round" />
+<polyline points="1070,778 1120,815 1120,925" fill="none" stroke="#344454" stroke-width="4" stroke-linejoin="round" />
+<polygon points="1118,815 1099,808 1110,797" fill="#172e43"/>
+<text x="1142" y="779" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="#172e43" text-anchor="start">Q2 2N3904</text>
+<text x="1030" y="777" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">B</text>
+<text x="1130" y="703" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">C</text>
+<text x="1130" y="857" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">E</text>
+<text x="1140" y="930" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#344454" text-anchor="start">GND</text>
+<circle cx="1120" cy="640" r="6" fill="#2760c5"/>
+<polyline points="1120,640 1505,640" fill="none" stroke="#2760c5" stroke-width="4" stroke-linejoin="round" />
+<text x="1160" y="667" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#2760c5" text-anchor="start">OUT2 -&gt; 4 SDA / GPIO4 / board D2</text>
+<polyline points="1190,640 1190,578 1230,578" fill="none" stroke="#a738a3" stroke-width="4" stroke-linejoin="round" />
+<polyline points="1230,578 1390,578" fill="none" stroke="#172e43" stroke-width="3" stroke-linejoin="round" />
+<rect x="1267.0" y="565" width="86" height="26" rx="4" fill="#f4deaf" stroke="#172e43" stroke-width="2"/>
+<text x="1310.0" y="550" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="middle">R7 10k</text>
+<polyline points="1390,578 1490,578" fill="none" stroke="#a738a3" stroke-width="4" stroke-linejoin="round" />
+<text x="1490" y="564" font-family="Arial,sans-serif" font-size="19" font-weight="normal" fill="#a738a3" text-anchor="end">Board 3V3</text>
+<circle cx="1190" cy="640" r="6" fill="#2760c5"/>
+<rect x="50" y="960" width="1500" height="84" rx="10" fill="#fff1d9" stroke="#fff1d9" stroke-width="2"/>
+<text x="70" y="992" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">GPIO is connected to the collector junction, not through the collector pull-up resistor.</text>
+<text x="70" y="1022" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Both firmware Wiegand pins stay inverted: true. All four resistors in each channel are required here.</text>
+</svg>

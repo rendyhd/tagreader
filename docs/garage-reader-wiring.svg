@@ -1,70 +1,98 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1120" viewBox="0 0 1280 1120">
-<style>text{font-family:Arial,sans-serif;fill:#162838} .title{font-size:30px;font-weight:bold}.h{font-size:21px;font-weight:bold}.t{font-size:18px}.small{font-size:16px}.wire{fill:none;stroke:#354e60;stroke-width:3}.box{fill:#eef5fa;stroke:#bed0dc;stroke-width:2}.dot{fill:#354e60}.power{fill:none;stroke:#cc4939;stroke-width:3}</style>
-<rect width="1280" height="1120" fill="white"/>
-<text x="40" y="48" class="title">Garage card reader • LOLIN D1 mini + 12 V Wiegand</text>
-<text x="40" y="78" class="t">Board D1 / D2 are GPIO5 / GPIO4. Reader D0 / D1 are signal names.</text>
-<rect x="40" y="105" width="1200" height="55" rx="8" fill="#fff2df"/>
-<text x="60" y="140" class="h">Use BOTH input stages below. Never connect 12 V or reader data directly to GPIO.</text>
-<rect x="50" y="195" width="240" height="180" rx="10" class="box"/>
-<text x="70" y="230" class="h">Regulated 12 V DC</text>
-<text x="70" y="265" class="t">+12 V</text><text x="70" y="345" class="t">0 V / GND</text>
-<rect x="470" y="190" width="310" height="190" rx="10" class="box"/>
-<text x="490" y="225" class="h">Photographed reader</text>
-<text x="490" y="265" class="t">RED • VCC +12 V</text>
-<text x="490" y="345" class="t">BLACK • GND</text>
-<path d="M290 260 H470" class="power"/><text x="325" y="247" class="small">+12 V</text>
-<path d="M290 340 H470" class="wire"/>
-<rect x="890" y="190" width="320" height="130" rx="10" class="box"/>
-<text x="910" y="225" class="h">12 V → 5 V buck</text>
-<text x="910" y="258" class="t">Set output to 5.0 V first</text>
-<text x="910" y="289" class="small">5 V output rated ≥ 500 mA</text>
-<path d="M365 260 V175 H1040 V190" class="power"/><circle cx="365" cy="260" r="5" fill="#cc4939"/>
-<rect x="890" y="395" width="320" height="225" rx="10" class="box"/>
-<text x="910" y="432" class="h">LOLIN D1 mini V4</text>
-<text x="910" y="467" class="t">VBUS ← regulated 5 V only</text>
-<text x="910" y="500" class="t">GND ← common ground</text>
-<text x="910" y="533" class="t">3V3 → input pull-ups</text>
-<text x="910" y="566" class="t">GPIO5 / D1 / printed 5 ← Q1</text>
-<text x="910" y="599" class="t">GPIO4 / D2 / printed 4 ← Q2</text>
-<path d="M1110 320 V395" class="power"/><text x="1125" y="365" class="small">5 V</text>
-<path d="M360 340 V660 H1250 V500 H1210 M990 320 V350 H1250 V500" class="wire"/>
-<circle cx="360" cy="340" r="5" class="dot"/><text x="620" y="687" class="t">COMMON GROUND: reader, buck, board, Q1/Q2 emitters</text>
-<rect x="50" y="405" width="730" height="215" rx="10" class="box"/>
-<text x="70" y="441" class="h">Reader wire mapping</text>
-<text x="70" y="480" class="t" fill="#23834e">GREEN D0 → Q1 input → GPIO5 / board D1</text>
-<text x="70" y="517" class="t">WHITE D1 → Q2 input → GPIO4 / board D2</text>
-<text x="70" y="554" class="t">BROWN → GND for WG34, as stated on your sticker</text>
-<text x="70" y="591" class="t">BLUE LED and YELLOW BEEP: insulate separately, unused</text>
-<text x="50" y="733" class="h">Build this circuit twice: Q1 for GREEN D0, Q2 for WHITE D1</text>
-<text x="50" y="763" class="small">One 2N3904 + 47 kΩ + 100 kΩ + two 10 kΩ + one 1N4148 per channel. Check E/B/C lead order.</text>
-<!-- Input bias: diode anode at 5V, striped cathode toward resistor/data -->
-<text x="105" y="812" class="t">5 V</text>
-<path d="M140 821 V830 H190" class="wire"/>
-<path d="M190 818 L210 830 L190 842 Z M214 817 V843" fill="none" stroke="#354e60" stroke-width="3"/>
-<path d="M214 830 H250" class="wire"/>
-<rect x="250" y="821" width="70" height="18" fill="white" stroke="#354e60" stroke-width="3"/>
-<path d="M320 830 H360 V910" class="wire"/>
-<text x="175" y="792" class="small">1N4148 • stripe →</text><text x="253" y="863" class="small">10 kΩ</text>
-<text x="50" y="939" class="t">Reader DATA</text>
-<path d="M180 910 H450" class="wire"/><circle cx="360" cy="910" r="5" class="dot"/>
-<rect x="450" y="901" width="85" height="18" fill="white" stroke="#354e60" stroke-width="3"/>
-<text x="455" y="892" class="t">47 kΩ</text>
-<path d="M535 910 H680" class="wire"/><circle cx="580" cy="910" r="5" class="dot"/>
-<!-- Base pulldown -->
-<path d="M580 910 V945" class="wire"/><rect x="571" y="945" width="18" height="50" fill="white" stroke="#354e60" stroke-width="3"/>
-<text x="595" y="977" class="t">100 kΩ</text><path d="M580 995 V1020" class="wire"/>
-<!-- NPN symbol: collector top, emitter bottom, outward arrow -->
-<circle cx="718" cy="910" r="48" fill="white" stroke="#354e60" stroke-width="2"/>
-<path d="M680 910 H700 M700 885 V935 M700 897 L735 870 V830 M700 923 L735 952 V1020" class="wire"/>
-<path d="M724 936 L735 952 L716 946" fill="#354e60"/>
-<text x="775" y="915" class="h">Q1 / Q2</text><text x="775" y="944" class="t">2N3904 NPN</text>
-<text x="652" y="903" class="small">B</text><text x="742" y="871" class="small">C</text><text x="742" y="991" class="small">E</text>
-<path d="M735 830 H1040" class="wire"/>
-<text x="855" y="857" class="t">GPIO5 (Q1) or GPIO4 (Q2)</text>
-<circle cx="835" cy="830" r="5" class="dot"/>
-<path d="M835 830 V795 H865" class="wire"/><rect x="865" y="786" width="75" height="18" fill="white" stroke="#354e60" stroke-width="3"/>
-<path d="M940 795 H1005" class="wire"/><text x="1015" y="800" class="t">board 3V3</text><text x="876" y="779" class="small">10 kΩ</text>
-<path d="M580 1020 H735 M658 1020 V1033 M636 1033 H680 M643 1041 H673 M651 1049 H665" class="wire"/>
-<circle cx="735" cy="1020" r="5" class="dot"/><text x="760" y="1032" class="t">common GND</text>
-<text x="50" y="1083" class="t">NPN inputs invert pulses: firmware uses inverted: true. Disconnect external VBUS 5 V during USB flashing.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100">
+<rect width="1600" height="1100" fill="white"/>
+<text x="50" y="61" font-family="Arial,sans-serif" font-size="36" font-weight="bold" fill="#172e43" text-anchor="start">1. Complete wiring and the exact D1 mini pads</text>
+<text x="50" y="102" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">USB powers the D1 mini. A separate fixed, regulated 12 V DC adapter powers the reader.</text>
+<polyline points="50,126 1550,126" fill="none" stroke="#cfdae3" stroke-width="2" stroke-linejoin="round" />
+<text x="50" y="1074" font-family="Arial,sans-serif" font-size="17" font-weight="normal" fill="#172e43" text-anchor="start">LOLIN D1 mini V4 / photographed Wiegand reader | proposed build; not bench-tested</text>
+<text x="1505" y="1074" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">1/5</text>
+<rect x="50" y="175" width="360" height="165" rx="10" fill="#f1f6fa" stroke="#b6c9d6" stroke-width="2"/>
+<text x="75" y="210" font-family="Arial,sans-serif" font-size="25" font-weight="bold" fill="#172e43" text-anchor="start">Reader&#x27;s 12 V DC adapter</text>
+<text x="75" y="249" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">+12 V -&gt; reader RED only</text>
+<text x="75" y="284" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Negative -&gt; common GND</text>
+<text x="75" y="316" font-family="Arial,sans-serif" font-size="17" font-weight="normal" fill="#172e43" text-anchor="start">Plug-in supply; no mains wiring</text>
+<rect x="50" y="400" width="360" height="360" rx="10" fill="#f1f6fa" stroke="#b6c9d6" stroke-width="2"/>
+<text x="75" y="440" font-family="Arial,sans-serif" font-size="27" font-weight="bold" fill="#172e43" text-anchor="start">Outdoor reader cable</text>
+<text x="75" y="482" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#c03432" text-anchor="start">RED</text>
+<text x="177" y="482" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">+12 V</text>
+<text x="75" y="518" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#344454" text-anchor="start">BLACK</text>
+<text x="177" y="518" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">GND</text>
+<text x="75" y="554" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#8a5036" text-anchor="start">BROWN</text>
+<text x="177" y="554" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">GND: select WG34</text>
+<text x="75" y="590" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#17835d" text-anchor="start">GREEN</text>
+<text x="177" y="590" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">D0 -&gt; interface IN1</text>
+<text x="75" y="626" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#52677b" text-anchor="start">WHITE</text>
+<text x="177" y="626" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">D1 -&gt; interface IN2</text>
+<text x="75" y="662" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#2760c5" text-anchor="start">BLUE</text>
+<text x="177" y="662" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">LED: insulate end</text>
+<text x="75" y="698" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#aa7b00" text-anchor="start">YELLOW</text>
+<text x="177" y="698" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">BEEP: insulate end</text>
+<polyline points="410,259 440,259 440,370 30,370 30,475 50,475" fill="none" stroke="#c03432" stroke-width="4" stroke-linejoin="round" />
+<rect x="500" y="400" width="390" height="360" rx="10" fill="#f1f6fa" stroke="#b6c9d6" stroke-width="2"/>
+<text x="525" y="440" font-family="Arial,sans-serif" font-size="27" font-weight="bold" fill="#172e43" text-anchor="start">Soldered input interface</text>
+<text x="525" y="488" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Two identical NPN channels</text>
+<text x="525" y="524" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">IN1: GREEN reader D0</text>
+<text x="525" y="560" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">IN2: WHITE reader D1</text>
+<text x="525" y="596" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">OUT1 -&gt; pad 5 SCL (D1)</text>
+<text x="525" y="632" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">OUT2 -&gt; pad 4 SDA (D2)</text>
+<text x="525" y="668" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">5V -&gt; VBUS; 3V3 -&gt; 3V3</text>
+<text x="525" y="704" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">GND -&gt; common GND</text>
+<polyline points="410,590 470,590 470,500 500,500" fill="none" stroke="#17835d" stroke-width="4" stroke-linejoin="round" />
+<polyline points="410,625 450,625 450,540 500,540" fill="none" stroke="#52677b" stroke-width="4" stroke-linejoin="round" />
+<rect x="1080" y="225" width="315" height="485" rx="10" fill="#d6eafa" stroke="#659abf" stroke-width="2"/>
+<text x="1237" y="262" font-family="Arial,sans-serif" font-size="24" font-weight="bold" fill="#172e43" text-anchor="middle">LOLIN D1 MINI</text>
+<text x="1237" y="291" font-family="Arial,sans-serif" font-size="17" font-weight="normal" fill="#172e43" text-anchor="middle">LABEL SIDE / BACK</text>
+<circle cx="1102" cy="329" r="9" fill="white"/>
+<circle cx="1373" cy="329" r="9" fill="white"/>
+<text x="1120" y="336" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">TX</text>
+<text x="1355" y="336" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="end">RST</text>
+<circle cx="1102" cy="370" r="9" fill="white"/>
+<circle cx="1373" cy="370" r="9" fill="white"/>
+<text x="1120" y="377" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">RX</text>
+<text x="1355" y="377" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="end">A0</text>
+<circle cx="1102" cy="411" r="9" fill="white"/>
+<circle cx="1373" cy="411" r="9" fill="white"/>
+<text x="1120" y="418" font-family="Arial,sans-serif" font-size="21" font-weight="bold" fill="#172e43" text-anchor="start">5 SCL</text>
+<text x="1355" y="418" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="end">16</text>
+<circle cx="1102" cy="452" r="9" fill="white"/>
+<circle cx="1373" cy="452" r="9" fill="white"/>
+<text x="1120" y="459" font-family="Arial,sans-serif" font-size="21" font-weight="bold" fill="#172e43" text-anchor="start">4 SDA</text>
+<text x="1355" y="459" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="end">14 SCK</text>
+<circle cx="1102" cy="493" r="9" fill="white"/>
+<circle cx="1373" cy="493" r="9" fill="white"/>
+<text x="1120" y="500" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">0</text>
+<text x="1355" y="500" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="end">12 MISO</text>
+<circle cx="1102" cy="534" r="9" fill="white"/>
+<circle cx="1373" cy="534" r="9" fill="white"/>
+<text x="1120" y="541" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">2</text>
+<text x="1355" y="541" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="end">13 MOSI</text>
+<circle cx="1102" cy="575" r="9" fill="white"/>
+<circle cx="1373" cy="575" r="9" fill="white"/>
+<text x="1120" y="582" font-family="Arial,sans-serif" font-size="21" font-weight="bold" fill="#172e43" text-anchor="start">GND</text>
+<text x="1355" y="582" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="end">15 SS</text>
+<circle cx="1102" cy="616" r="9" fill="white"/>
+<circle cx="1373" cy="616" r="9" fill="white"/>
+<text x="1120" y="623" font-family="Arial,sans-serif" font-size="21" font-weight="bold" fill="#172e43" text-anchor="start">VBUS</text>
+<text x="1355" y="623" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="end">3V3</text>
+<rect x="1200" y="680" width="75" height="58" rx="5" fill="#626f7c" stroke="#626f7c" stroke-width="2"/>
+<text x="1240" y="785" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="#172e43" text-anchor="middle">USB-C</text>
+<text x="1240" y="819" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="middle">5 V USB wall charger</text>
+<polyline points="1237,738 1237,756" fill="none" stroke="#d26916" stroke-width="9" stroke-linejoin="round" />
+<polyline points="890,540 965,540 965,411 1102,411" fill="none" stroke="#2760c5" stroke-width="4" stroke-linejoin="round" />
+<text x="923" y="398" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#2760c5" text-anchor="start">OUT1</text>
+<polyline points="890,581 988,581 988,452 1102,452" fill="none" stroke="#2760c5" stroke-width="4" stroke-linejoin="round" />
+<text x="993" y="482" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#2760c5" text-anchor="start">OUT2</text>
+<text x="949" y="700" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#d26916" text-anchor="start">5V bias only</text>
+<text x="1330" y="895" font-family="Arial,sans-serif" font-size="19" font-weight="normal" fill="#a738a3" text-anchor="start">3V3 to interface only</text>
+<polyline points="410,302 460,302 460,910 1060,910 1060,575 1102,575" fill="none" stroke="#344454" stroke-width="4" stroke-linejoin="round" />
+<polyline points="890,655 1008,655 1008,616 1102,616" fill="none" stroke="#d26916" stroke-width="4" stroke-linejoin="round" />
+<polyline points="1373,616 1450,616 1450,870 870,870 870,760" fill="none" stroke="#a738a3" stroke-width="4" stroke-linejoin="round" />
+<circle cx="460" cy="910" r="6" fill="#344454"/>
+<circle cx="700" cy="910" r="6" fill="#344454"/>
+<polyline points="410,515 430,515 430,910 460,910" fill="none" stroke="#344454" stroke-width="4" stroke-linejoin="round" />
+<polyline points="410,552 425,552 425,930 700,930 700,910" fill="none" stroke="#8a5036" stroke-width="4" stroke-linejoin="round" />
+<polyline points="700,760 700,910" fill="none" stroke="#344454" stroke-width="4" stroke-linejoin="round" />
+<text x="720" y="940" font-family="Arial,sans-serif" font-size="19" font-weight="normal" fill="#172e43" text-anchor="start">COMMON GND: adapter -, reader BLACK/BROWN, interface, D1 mini</text>
+<rect x="50" y="962" width="1500" height="84" rx="10" fill="#fff1d9" stroke="#fff1d9" stroke-width="2"/>
+<text x="70" y="994" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Orient your board by its printed labels. Reader D1 is NOT board D1; follow the mapping above.</text>
+<text x="70" y="1024" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">12 V never goes to VBUS, 3V3 or GPIO. Leave gate motor/relay wiring to the existing HA gate controller.</text>
 </svg>

@@ -12,3 +12,5 @@
 /.pytest_cache/
 **/__pycache__/
 /.venv*/
+/.diagram-deps/
+/tmp/pdfs/

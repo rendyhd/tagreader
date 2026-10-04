@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100">
+<rect width="1600" height="1100" fill="white"/>
+<text x="50" y="61" font-family="Arial,sans-serif" font-size="36" font-weight="bold" fill="#172e43" text-anchor="start">5. Parts, soldering order and first power-up</text>
+<text x="50" y="102" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">You already have the reader and D1 mini. The interface parts and reader power supply are still needed.</text>
+<polyline points="50,126 1550,126" fill="none" stroke="#cfdae3" stroke-width="2" stroke-linejoin="round" />
+<text x="50" y="1074" font-family="Arial,sans-serif" font-size="17" font-weight="normal" fill="#172e43" text-anchor="start">LOLIN D1 mini V4 / photographed Wiegand reader | proposed build; not bench-tested</text>
+<text x="1505" y="1074" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">5/5</text>
+<text x="50" y="175" font-family="Arial,sans-serif" font-size="27" font-weight="bold" fill="#172e43" text-anchor="start">Additional parts</text>
+<text x="55" y="217" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">2</text>
+<text x="95" y="217" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">2N3904 NPN, TO-92; matching E-B-C pinout</text>
+<text x="55" y="252" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">2</text>
+<text x="95" y="252" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">1N4148 axial diodes</text>
+<text x="55" y="287" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">4</text>
+<text x="95" y="287" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">10k ohm resistors, 1/4 W, 1% or 5%</text>
+<text x="55" y="322" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">2</text>
+<text x="95" y="322" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">47k ohm resistors, 1/4 W, 1% or 5%</text>
+<text x="55" y="357" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">2</text>
+<text x="95" y="357" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">100k ohm resistors, 1/4 W, 1% or 5%</text>
+<text x="55" y="392" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">1</text>
+<text x="95" y="392" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Isolated-pad perfboard, &gt;=24 x 20 holes (2.54 mm)</text>
+<text x="55" y="427" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">1</text>
+<text x="95" y="427" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Fixed regulated 12 V DC wall adapter</text>
+<text x="55" y="462" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">1</text>
+<text x="95" y="462" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Matching DC barrel-to-screw adapter, if needed</text>
+<text x="55" y="497" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">1</text>
+<text x="95" y="497" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">5 V USB charger + USB-C cable for the D1 mini</text>
+<text x="55" y="532" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">-</text>
+<text x="95" y="532" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Insulated wire, solder, flux, heat-shrink, enclosure</text>
+<text x="55" y="610" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">Reader current rating is unknown: choose a regulated</text>
+<text x="55" y="640" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">12 V supply with at least 1 A available for this reader.</text>
+<text x="55" y="686" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">Resistor identification (4-band, gold tolerance)</text>
+<text x="55" y="723" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">10k: brown - black - orange - gold</text>
+<text x="55" y="755" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">47k: yellow - violet - orange - gold</text>
+<text x="55" y="787" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">100k: brown - black - yellow - gold</text>
+<text x="55" y="846" font-family="Arial,sans-serif" font-size="21" font-weight="bold" fill="#172e43" text-anchor="start">2N3904 FRONT VIEW</text>
+<text x="55" y="877" font-family="Arial,sans-serif" font-size="19" font-weight="normal" fill="#172e43" text-anchor="start">Flat face toward you; legs down.</text>
+<text x="55" y="905" font-family="Arial,sans-serif" font-size="19" font-weight="normal" fill="#172e43" text-anchor="start">Supplier pin order must match.</text>
+<rect x="460" y="813" width="135" height="55" rx="8" fill="#344454" stroke="#344454" stroke-width="2"/>
+<text x="528" y="848" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="white" text-anchor="middle">2N3904</text>
+<polyline points="480,868 480,903" fill="none" stroke="#172e43" stroke-width="5" stroke-linejoin="round" />
+<text x="480" y="927" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="middle">E</text>
+<polyline points="528,868 528,903" fill="none" stroke="#172e43" stroke-width="5" stroke-linejoin="round" />
+<text x="528" y="927" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="middle">B</text>
+<polyline points="576,868 576,903" fill="none" stroke="#172e43" stroke-width="5" stroke-linejoin="round" />
+<text x="576" y="927" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="middle">C</text>
+<text x="850" y="175" font-family="Arial,sans-serif" font-size="27" font-weight="bold" fill="#172e43" text-anchor="start">Build with both supplies unplugged</text>
+<text x="850" y="215" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">1. Solder the D1 mini headers, or use short wires</text>
+<text x="850" y="244" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   directly on the labelled pads shown on page 1.</text>
+<text x="850" y="273" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">2. Insert resistors and diodes per page 3. Resistors</text>
+<text x="850" y="302" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   have no polarity; diode stripes must face H2/H12.</text>
+<text x="850" y="331" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">3. Fit both 2N3904s. Spread leads gently to the holes;</text>
+<text x="850" y="360" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   keep E, B and C separate. Solder; trim the leads.</text>
+<text x="850" y="389" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">4. Add INSULATED wires on the copper side using</text>
+<text x="850" y="418" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   the page 4 groups. No stripboard / common rows.</text>
+<text x="850" y="447" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">5. Connect the seven interface wire pads below.</text>
+<text x="850" y="476" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">6. Connect RED to adapter +12 V. Adapter negative,</text>
+<text x="850" y="505" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   reader BLACK/BROWN and board GND join together.</text>
+<text x="850" y="534" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">7. Heat-shrink BLUE and YELLOW separately. Secure</text>
+<text x="850" y="563" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   the cable; mount the interface/controller indoors.</text>
+<text x="850" y="592" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">8. Inspect both sides closely for shorts and loose</text>
+<text x="850" y="621" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   strands. Neither supply is connected yet.</text>
+<text x="850" y="650" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">9. Flash garage-reader.yaml over USB. Then power</text>
+<text x="850" y="679" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   the reader with 12 V. Keep the common GND wire.</text>
+<text x="850" y="708" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">10. Check Last Frame Bits = 34 and Last Card in HA.</text>
+<text x="850" y="737" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">    Try a notification before enabling gate actions.</text>
+<text x="850" y="809" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">Interface pads -&gt; external wires</text>
+<text x="850" y="847" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">B2 -&gt; board VBUS; V2 -&gt; board 3V3; V18 -&gt; GND</text>
+<text x="850" y="878" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">B6 -&gt; GREEN; B16 -&gt; WHITE</text>
+<text x="850" y="909" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">V6 -&gt; board 5 SCL; V16 -&gt; board 4 SDA</text>
+<rect x="50" y="935" width="1500" height="114" rx="10" fill="#fff1d9" stroke="#fff1d9" stroke-width="2"/>
+<text x="70" y="967" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Without a meter, use fixed regulated supplies, not an adjustable buck converter. Visual inspection is limited.</text>
+<text x="70" y="997" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">This input circuit is intended for ordinary 0-12 V Wiegand logic; it is not a certified outdoor surge protector.</text>
+<text x="70" y="1027" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Sources: your reader label; WEMOS D1 mini documentation; onsemi 2N3903/2N3904; Vishay 1N4148 datasheets.</text>
+</svg>
