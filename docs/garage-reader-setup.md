@@ -22,6 +22,10 @@ with the movie reader's PN532 are not necessarily compatible with this reader.
 
 ## Parts and wiring
 
+See [hardware research and conditional simpler wiring](garage-reader-hardware-research.md)
+for the ordered dual-frequency variant, the mainboard recommendation, and an
+assembled converter alternative if the reader's data signals are confirmed as 0–5 V.
+
 ![Wiring diagram](garage-reader-wiring.svg)
 
 Add a regulated 12 V DC supply sized to the reader's specified current plus the
