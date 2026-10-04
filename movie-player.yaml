@@ -4,7 +4,12 @@ substitutions:
   name: movie-time
   friendly_name: Movie Time
   insertion_delay_ms: "150"
+  # Also how long PN532 communication warnings may last before deselecting.
   removal_delay_ms: "1500"
+  poll_interval_ms: "500"
+  # Played when a case is accepted, and by Test Buzzer (RTTTL format). Try
+  # others first with the play_rtttl action below; volume is the rtttl gain.
+  scan_tune: "read:d=16,o=5,b=160:c,e,g,8c6"
 
 esphome:
   name: ${name}
@@ -42,6 +47,14 @@ api:
   max_connections: 3
   # HA outages do not cause periodic restarts or night-time startup beeps.
   reboot_timeout: 0s
+  actions:
+    # Developer Tools → Actions → esphome.<device>_play_rtttl, to try a tune
+    # without reflashing. Copy the one you like into scan_tune.
+    - action: play_rtttl
+      variables:
+        song_str: string
+      then:
+        - rtttl.play: !lambda 'return song_str;'
 
 ota:
   - platform: esphome
@@ -53,16 +66,10 @@ i2c:
   frequency: 100kHz
   scan: true
 
-globals:
-  - id: movie_ready
-    type: bool
-    restore_value: false
-    initial_value: "false"
-
 pn532_i2c:
   id: pn532_board
   address: 0x24
-  update_interval: 250ms
+  update_interval: ${poll_interval_ms}ms
   on_tag:
     # One synchronous action: do not retain/copy NfcTag through delayed actions.
     - lambda: |-
@@ -87,12 +94,13 @@ interval:
       - lambda: |-
           const uint32_t now = millis();
           // Request failures can bypass PN532's on_tag_removed callback.
-          movie_time::reader().fault(id(pn532_board).is_failed() || id(pn532_board).status_has_warning(), now);
+          movie_time::reader().fault(id(pn532_board).is_failed() || id(pn532_board).status_has_warning(),
+                                     now, ${removal_delay_ms});
           movie_time::reader().tick(now, ${insertion_delay_ms}, ${removal_delay_ms});
-          if (!id(movie_ready)) {
-            if (now < 3000) return;
-            id(movie_ready) = true;
-          }
+          // At boot, wait for two clean polls (or a selected case) so a held
+          // case is never reported as empty first.
+          if (!movie_time::reader().ready(now, 2 * ${poll_interval_ms} + ${insertion_delay_ms}))
+            return;
           const auto &selected = movie_time::reader().selected_id();
           if (!id(selected_tag).has_state() || id(selected_tag).state != selected) {
             const bool had_state = id(selected_tag).has_state();
@@ -201,7 +209,8 @@ output:
 rtttl:
   id: buzzer
   output: buzzer_output
-  gain: 50%
+  # Lower is softer; 50% is the loudest and harshest.
+  gain: 25%
 
 light:
   - platform: neopixelbus
@@ -234,7 +243,7 @@ script:
           condition:
             switch.is_on: buzzer_enabled
           then:
-            - rtttl.play: "read:d=16,o=5,b=150:c,e"
+            - rtttl.play: "${scan_tune}"
 
 button:
   - platform: template
@@ -252,7 +261,7 @@ button:
     name: Test Buzzer
     entity_category: diagnostic
     on_press:
-      - rtttl.play: "test:d=8,o=5,b=120:c,e,g"
+      - rtttl.play: "${scan_tune}"
   - platform: restart
     name: Restart
     entity_category: diagnostic

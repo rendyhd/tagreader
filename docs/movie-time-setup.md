@@ -19,11 +19,16 @@ for your printed DVD/Blu-ray player. Kodi plays the movies; the reader selects t
 | Briefly wobble the case | No stop if the same tag returns within the removal delay |
 | Insert an unknown case | Do not start anything; stop the previous Movie Time session |
 | Reconnect/reboot | Do not automatically start a movie; press Play or reinsert |
+| Kodi briefly disconnects | Keep playing if the same case is still inserted |
 
-The reader waits 300 ms before selecting a new case and 1500 ms after a removal
-report before clearing it. The PN532 polls every 500 ms, so actual timing includes
-the next poll and communication time. A sufficiently long loss of NFC reception
-is indistinguishable from removing the case. Test tag position with both formats.
+The reader waits `insertion_delay_ms` (150 ms) before selecting a new case and
+`removal_delay_ms` (1500 ms) after a removal report before clearing it. The PN532
+polls every `poll_interval_ms` (500 ms), so actual timing includes the next poll
+and communication time. These are the defaults at the top of `movie-player.yaml`.
+A sufficiently long loss of NFC reception is indistinguishable from removing the
+case. Test tag position with both formats. After a reboot the reader reports
+nothing until it has polled cleanly twice, so a case left inserted is reported as
+present, never as a new insertion.
 
 ## 1. Keep a rollback copy
 
@@ -72,7 +77,7 @@ Check these entities before enabling movie playback:
 2. **Selected Tag** changes when you insert a case and becomes empty after removal.
 3. **Selected UID** shows the physical tag UID for troubleshooting.
 4. **Play Button / Pause Button / Stop Button** each change off → on → off.
-5. **Test LED** flashes green. **Test Buzzer** plays a short tune. These diagnostic
+5. **Test LED** flashes green. **Test Buzzer** plays the scan tune. These diagnostic
    controls deliberately work even if ordinary scan feedback is disabled.
 
 **Buzzer Enabled** and **LED Enabled** control ordinary scan feedback. Saved
@@ -80,6 +85,13 @@ preferences survive reboot after the five-minute flash write interval; wait that
 long before power-cycling to verify a preference. There is no startup tune or
 code that forcibly re-enables a muted buzzer. The blue scan flash and short beep
 mean the tag was read, not that Kodi has successfully started the movie.
+
+To change the scan sound, edit `scan_tune` at the top of `movie-player.yaml`. It
+is an RTTTL string: `name:d=<note length>,o=<octave>,b=<tempo>:<notes>`, for
+example the default rising chime `read:d=16,o=5,b=160:c,e,g,8c6`. Volume is
+`gain` under `rtttl:`; 25% is softer than the harsher 50%. To try tunes without
+reflashing, run the device's `play_rtttl` action from Developer Tools → Actions
+with `song_str` set to a tune, then copy the one you like into `scan_tune`.
 
 ## 4. Confirm Kodi works through Home Assistant
 
@@ -148,7 +160,8 @@ alternative if your paths remain stable.
 ```
 
 Replace **every example ID/path** with your own values. Use the exact value of
-**Selected Tag**. Tags written with the Home Assistant app retain their stored
+**Selected Tag**; numeric IDs such as `1234` also work, quoted or not. Tags
+written with the Home Assistant app retain their stored
 HA ID; blank/other tags use their physical UID. To preserve the same ID when
 moving from a card to a new sticker, write that HA tag ID to the sticker using
 the companion app. The reader deliberately has no tag-writing/erase controls.
@@ -175,18 +188,22 @@ before final assembly, then repeat with the enclosure closed:
   after the reader has been unavailable for three seconds. Reconnecting does not
   autoplay. If the case was removed during a shorter interruption, the empty
   selected state on reconnect also stops it.
-- Restart HA or Kodi during a session: the helper lets the automation stop the
-  old session instead of replaying it automatically. If Kodi is unreachable,
-  stopping must wait until Kodi reconnects; no firmware can send a command through
-  an unavailable HA/Kodi connection.
+- Restart HA during a session: the helper lets the automation stop the old
+  session instead of replaying it automatically.
+- Disconnect Kodi briefly while A plays: when it reconnects with A still inserted,
+  A keeps playing. If A was removed or swapped meanwhile, or a Stop was pending,
+  the reconnect stops it instead. Nothing restarts automatically. If Kodi is
+  unreachable, stopping must wait until Kodi reconnects; no firmware can send a
+  command through an unavailable HA/Kodi connection.
 
 The helper records this automation's requested session, including a request whose
 outcome is uncertain after a connection failure. It does not independently
 identify media started later with a different remote. Stop/end the Movie Time
 session before using Kodi manually; otherwise later removal can stop that media.
-If Kodi does not confirm a Stop within three seconds, the helper is retained.
-Check Kodi/the automation trace and press Stop again; reconnecting Kodi also
-retries cleanup. A successful service return alone is not proof of playback.
+While a stop is waiting for Kodi to confirm idle, the helper shows `⏹`. If Kodi
+does not confirm within three seconds, the helper keeps `⏹`. Check Kodi/the
+automation trace and press Stop again; reconnecting Kodi also retries cleanup.
+A successful service return alone is not proof of playback.
 
 ## Wiring and troubleshooting
 
@@ -214,15 +231,15 @@ when pressed. Do not use two legs permanently joined inside a four-leg switch.
 | Reader Healthy off / no 0x24 | Board mode, VCC/GND, D1/SCL and D2/SDA, solder joints. Do not guess a different I²C address. |
 | Selected Tag changes, no movie | Blueprint entity choices, exact tag mapping, Kodi availability, automation trace and active helper. |
 | Stops with case still inserted | Watch Selected Tag and Reader Healthy; improve sticker alignment/read distance and wiring. A longer removal delay can mask brief loss but cannot fix bad reception. |
-| Sustained PN532 communication failure | Selection clears after 1.5 seconds of warnings; fix the connection, then remove and reinsert the case. No automatic recovery claim for a failed PN532 setup. |
+| Sustained PN532 communication failure | Selection clears after warnings last as long as the removal delay (1.5 seconds by default); fix the connection, then remove and reinsert the case. No automatic recovery claim for a failed PN532 setup. |
 | Buzzer silent, Test LED works | Use Test Buzzer, verify D7 and GND, and confirm passive buzzer type. Issue #305 has no confirmed universal fix; compilation is not an acoustic test. |
 | Crashes when tag stays inserted | Monitor Uptime and Free Heap. Keep the PN532 apart from the D1 antenna; your enclosure already separates the boards. Test a different power cable and an ordinary NTAG sticker. |
 | Button events missing | Check each binary sensor; Stop needs its external 10 kΩ to 3V3. Use the new firmware's button definitions. |
 | Scan beep but wrong/no movie | Feedback means NFC detection; inspect the HA automation trace and test Player.Open directly. |
 
 For ordinary operation use small NTAG213/215 stickers or your known-working cards.
-The application accepts HA IDs up to 128 bytes; reserved HA states and control
-characters fall back to UID. Very large/malformed NDEF payloads are still parsed
+The application accepts printable ASCII HA IDs up to 128 characters; reserved
+HA states, control characters and non-ASCII text fall back to UID. Very large/malformed NDEF payloads are still parsed
 by ESPHome's PN532/NFC driver before this application's filter. This is not a
 general-purpose NFC parser hardening patch.
 

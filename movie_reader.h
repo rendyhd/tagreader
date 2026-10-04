@@ -5,12 +5,13 @@
 
 namespace movie_time {
 
-// Keep IDs small and reject control characters before publishing them to HA.
+// Keep IDs small and printable ASCII before publishing them to HA. Rejecting
+// bytes >= 0x7f also rules out invalid UTF-8, which the API cannot carry.
 inline bool valid_id(const std::string &value) {
   if (value.empty() || value.size() > 128)
     return false;
   for (unsigned char c : value)
-    if (c < 0x20 || c == 0x7f)
+    if (c < 0x20 || c >= 0x7f)
       return false;
   return value != "unknown" && value != "unavailable";
 }
@@ -32,14 +33,21 @@ class ReaderState {
     if (!valid_id(uid) || !valid_id(id))
       return;
     // Some PN532 reads expose only the UID after an earlier read exposed the
-    // tag's NDEF/HA ID.  Keep that richer ID while the same physical tag is
-    // still present, otherwise HA would alternate between two movie IDs.
-    if (uid == observed_uid_ && id == uid && observed_id_ != uid)
-      return;
-    if (uid == observed_uid_ && id == observed_id_)
+    // tag's NDEF/HA ID. Keep that richer ID while the same physical tag is
+    // present, otherwise HA would alternate between two movie IDs. PN532
+    // reports a removal before it repeats a UID, so also check the selection,
+    // which survives the removal delay.
+    std::string best = id;
+    if (id == uid) {
+      if (uid == observed_uid_ && observed_id_ != uid)
+        best = observed_id_;
+      else if (uid == selected_uid_ && selected_id_ != uid)
+        best = selected_id_;
+    }
+    if (uid == observed_uid_ && best == observed_id_)
       return;
     observed_uid_ = uid;
-    observed_id_ = id;
+    observed_id_ = best;
     changed_at_ = now;
   }
 
@@ -58,15 +66,12 @@ class ReaderState {
   }
 
   void fault(bool failed, uint32_t now, uint32_t grace_ms = 1500) {
-    if (!failed) {
-      fault_pending_ = false;
-      return;
+    const auto health = failed ? Health::FAULT : Health::OK;
+    if (health != health_) {
+      health_ = health;
+      health_since_ = now;
     }
-    if (!fault_pending_) {
-      fault_pending_ = true;
-      fault_since_ = now;
-    }
-    if (static_cast<uint32_t>(now - fault_since_) >= grace_ms) {
+    if (failed && static_cast<uint32_t>(now - health_since_) >= grace_ms) {
       observed_uid_.clear();
       observed_id_.clear();
       selected_uid_.clear();
@@ -88,17 +93,32 @@ class ReaderState {
     return true;
   }
 
+  // At boot, publish nothing until the reader knows what is present. A held
+  // case is ready once selected (HA sees unavailable -> case, which never
+  // autoplays). An empty reader is ready only after polling cleanly for
+  // settle_ms, so a slow first read cannot look like a new insertion.
+  bool ready(uint32_t now, uint32_t settle_ms) {
+    if (!ready_)
+      ready_ = !selected_uid_.empty() ||
+               (observed_uid_.empty() && health_ == Health::OK &&
+                static_cast<uint32_t>(now - health_since_) >= settle_ms);
+    return ready_;
+  }
+
   const std::string &selected_id() const { return selected_id_; }
   const std::string &selected_uid() const { return selected_uid_; }
 
  private:
+  enum class Health : uint8_t { UNKNOWN, OK, FAULT };
+
   std::string observed_uid_;
   std::string observed_id_;
   std::string selected_uid_;
   std::string selected_id_;
   uint32_t changed_at_{0};
-  uint32_t fault_since_{0};
-  bool fault_pending_{false};
+  uint32_t health_since_{0};
+  Health health_{Health::UNKNOWN};
+  bool ready_{false};
 };
 
 inline ReaderState &reader() {

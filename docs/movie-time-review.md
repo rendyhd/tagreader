@@ -22,10 +22,10 @@ establish that it is universally broken.
 | Finding | Evidence and consequence | Change / limit |
 |---|---|---|
 | Runtime memory pressure during tag actions | [#261](https://github.com/adonno/tagreader/issues/261) contains decoded OOM traces through NfcTag copies; [#238](https://github.com/adonno/tagreader/issues/238) reports Android NDEF crashes. The original action tree carries tag values through conditions/delays. | One synchronous parse action, no asynchronous NfcTag storage, first valid HA URI only, smaller feature set. This does not harden ESPHome’s entire NFC parser or prove runtime memory stability. |
-| Held cases need different behaviour from tap cards | [#222](https://github.com/adonno/tagreader/issues/222), [#3](https://github.com/adonno/tagreader/issues/3), [#243](https://github.com/adonno/tagreader/issues/243). Current PN532 callbacks report transitions; repeated successful polls of one UID do not produce new on_tag callbacks. | Presence state waits for explicit removal/fault, with 300 ms insertion and 1500 ms absence debounce. No last-scan timeout that would eject a held case. |
+| Held cases need different behaviour from tap cards | [#222](https://github.com/adonno/tagreader/issues/222), [#3](https://github.com/adonno/tagreader/issues/3), [#243](https://github.com/adonno/tagreader/issues/243). Current PN532 callbacks report transitions; repeated successful polls of one UID do not produce new on_tag callbacks. | Presence state waits for explicit removal/fault, with configurable insertion (150 ms) and absence (1500 ms) delays and a 500 ms poll. A UID-only re-read during the absence delay keeps the tag's HA ID. No last-scan timeout that would eject a held case. |
 | Brief absence, direct swaps and stale removal | PN532 can report a failed read as removal and can report B without a separate removal of A. | State helper ignores stale A removals after B, cancels brief dropouts and handles direct swaps. Tests include long holds and clock rollover. |
-| Reader request failures can leave a stale case | The current PN532 `update()` warning path returns without calling on_tag_removed. | Persistent warning/failure for 1500 ms clears selection. Brief warnings do not. Reinsert after a sustained fault; a permanently failed setup still needs hardware recovery. |
-| Event loss and reconnect replay | Reader events can be dropped before HA subscribes; transient events do not describe present state after reconnect. | Use ordinary selected-tag/button entities. No custom event subscription or device-to-HA action permission required. Initial/reconnected state never auto-starts playback. |
+| Reader request failures can leave a stale case | The current PN532 `update()` warning path returns without calling on_tag_removed. | Warning/failure lasting the removal delay (1500 ms by default) clears selection. Brief warnings do not. Reinsert after a sustained fault; a permanently failed setup still needs hardware recovery. |
+| Event loss and reconnect replay | Reader events can be dropped before HA subscribes; transient events do not describe present state after reconnect. | Use ordinary selected-tag/button entities. No custom event subscription or device-to-HA action permission required. Initial/reconnected state never auto-starts playback; after boot the reader reports only once it has polled cleanly. |
 | Buttons need electrical and temporal care | D0 has no pull-up/interrupt support; fast presses can be coalesced by API batching. | D5/D6 internal pull-ups; D0 external 10 kΩ to 3V3 and polling; debounce and zero API batching delay. HA triggers only off→on edges from selected entities. |
 | Existing HA tags must keep their IDs | [#231](https://github.com/adonno/tagreader/issues/231), [#40](https://github.com/adonno/tagreader/issues/40). Raw UID and stored HA ID are different. | Preserve first canonical `https://www.home-assistant.io/tag/…` URI ID, otherwise UID. Ignore Android/app and unrelated URI records. Show both selected ID and UID. |
 | Buzzer preferences and startup noise | [#126](https://github.com/adonno/tagreader/issues/126), [#184](https://github.com/adonno/tagreader/issues/184); original boot actions force switches on. | No startup tune/forced enable; saved mute preferences. Valid RTTTL durations. [#305](https://github.com/adonno/tagreader/issues/305) has no confirmed universal fix; physical Test Buzzer remains required. |
@@ -112,8 +112,10 @@ Still required on the user’s hardware: NFC range/alignment in both case format
 a prolonged held-case test, actual buzzer/LED response, switch operation, correct
 Kodi movie IDs/paths, HA entity selection and network-loss recovery. A failed
 Wi-Fi/HA/Kodi connection cannot deliver an immediate Stop command; the blueprint
-retains the session for cleanup when Kodi reconnects. After an unconfirmed stop
-while Kodi remains connected, check the trace and press Stop again. The session
+marks the stop (`⏹` in the helper) and retries it when Kodi reconnects. A brief
+Kodi disconnect with the same case still inserted does not stop the movie. After
+an unconfirmed stop while Kodi remains connected, check the trace and press Stop
+again. The session
 helper tracks this automation’s requested movie, not arbitrary later media
 started with another remote.
 

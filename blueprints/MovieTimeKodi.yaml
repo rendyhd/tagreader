@@ -123,19 +123,34 @@ actions:
       player_entity: !input kodi_player
       session_entity: !input session_helper
       movies: !input movies
+      # Marks a stop Kodi has not confirmed yet. The reader only publishes
+      # printable ASCII, so this can never be a tag ID.
+      stopping: "⏹"
   - variables:
-      current_tag: "{{ states(tag_entity) }}"
-      active_tag: "{{ states(session_entity) }}"
+      # Rendered variables are parsed as Python literals, so an ID such as
+      # "1234" would turn into a number. Inside a mapping the IDs stay text.
+      ids: "{{ {'current': states(tag_entity), 'active': states(session_entity)} }}"
       player_state: "{{ states(player_entity) }}"
   - variables:
-      movie: "{{ movies.get(current_tag, {}) if movies is mapping else {} }}"
-      active_movie: "{{ movies.get(active_tag, {}) if movies is mapping else {} }}"
-      has_session: "{{ active_tag not in ['', 'unknown', 'unavailable'] }}"
+      # Keys are compared as text, so an unquoted numeric key such as 1234 matches.
+      movie: >-
+        {% set ns = namespace(found={}) %}
+        {% for key, value in (movies.items() if movies is mapping else []) if key | string == ids.current %}{% set ns.found = value %}{% endfor %}
+        {{ ns.found }}
+      active_movie: >-
+        {% set ns = namespace(found={}) %}
+        {% for key, value in (movies.items() if movies is mapping else []) if key | string == ids.active %}{% set ns.found = value %}{% endfor %}
+        {{ ns.found }}
+      has_session: "{{ ids.active not in ['', 'unknown', 'unavailable'] }}"
   - variables:
-      valid_movie: >-
-        {{ movie is mapping and
-           ((movie.get('movieid') is integer and movie.get('movieid') is not boolean and movie.get('movieid') > 0)
-            or (movie.get('file') is string and movie.get('file') | length > 0)) }}
+      # What Player.Open receives; empty when the mapping has no usable movie.
+      item: >-
+        {% set m = movie if movie is mapping else {} %}
+        {% set mid = m.get('movieid') %}
+        {% if mid is integer and mid is not boolean and mid > 0 %}{{ {'movieid': mid} }}
+        {% elif m.get('file') is string and m.get('file') | length > 0 %}{{ {'file': m.get('file')} }}
+        {% else %}{{ {} }}{% endif %}
+      valid_movie: "{{ item | length > 0 }}"
       command: >-
         {% if trigger.id == 'open_error' %}
           {% set failed = trigger.event.data.get('input', {}).get('params', {}).get('item', {}) %}
@@ -143,31 +158,47 @@ actions:
              ((failed.get('movieid') is not none and failed.get('movieid') == active_movie.get('movieid'))
               or (failed.get('file') is not none and failed.get('file') == active_movie.get('file'))) %}
           {{ 'stop' if has_session and matches else 'ignore' }}
-        {% elif trigger.id in ['stop', 'offline', 'startup', 'kodi_reconnected'] %}
+        {% elif trigger.id in ['stop', 'offline', 'startup'] %}
           {{ 'stop' if has_session else 'ignore' }}
-        {% elif current_tag in ['', 'unknown', 'unavailable'] or not valid_movie %}
+        {% elif trigger.id == 'kodi_reconnected' %}
+          {# A brief Kodi dropout must not stop the inserted case's movie. An
+             unconfirmed stop or a case changed meanwhile is still cleaned up. #}
+          {{ 'stop' if has_session and (ids.active != ids.current or not valid_movie) else 'ignore' }}
+        {% elif ids.current in ['', 'unknown', 'unavailable'] or not valid_movie %}
           {{ 'stop' if has_session else 'ignore' }}
         {% elif trigger.id == 'pause' %}
-          {{ 'pause' if has_session and active_tag == current_tag and player_state == 'playing' else 'ignore' }}
+          {{ 'pause' if has_session and ids.active == ids.current and player_state == 'playing' else 'ignore' }}
         {% elif trigger.id == 'play' %}
-          {% if has_session and active_tag == current_tag and player_state == 'paused' %}resume
-          {% elif has_session and active_tag == current_tag and player_state == 'playing' %}ignore
+          {% if has_session and ids.active == ids.current and player_state == 'paused' %}resume
+          {% elif has_session and ids.active == ids.current and player_state == 'playing' %}ignore
           {% else %}open{% endif %}
         {% elif trigger.id == 'selection' %}
           {% if trigger.from_state is none or trigger.from_state.state in ['unknown', 'unavailable'] %}
-            {{ 'stop' if has_session and active_tag != current_tag else 'ignore' }}
-          {% elif trigger.to_state.state != current_tag or trigger.from_state.state == current_tag %}ignore
+            {{ 'stop' if has_session and ids.active != ids.current else 'ignore' }}
+          {% elif trigger.to_state.state != ids.current or trigger.from_state.state == ids.current %}ignore
+          {# A queued run must not restart the movie this session is already showing. #}
+          {% elif has_session and ids.active == ids.current and player_state in ['playing', 'paused'] %}ignore
           {% else %}open{% endif %}
         {% else %}ignore{% endif %}
   - choose:
       - conditions: "{{ command | trim == 'stop' }}"
         sequence:
-          # Kodi can swallow transport/protocol exceptions. Keep ownership until
-          # its state confirms idle, rather than assuming a returned call worked.
-          - condition: template
-            value_template: "{{ states(player_entity) not in ['unavailable', 'unknown', 'off'] }}"
           - if: "{{ not is_state(player_entity, 'idle') }}"
             then:
+              # Mark the stop before asking Kodi. If Kodi is unreachable or does
+              # not confirm it, reconnecting Kodi retries it, even with the case in.
+              - if: "{{ ids.active != stopping }}"
+                then:
+                  - action: input_text.set_value
+                    target:
+                      entity_id: "{{ session_entity }}"
+                    data:
+                      value: "{{ stopping }}"
+              - if: "{{ states(player_entity) in ['unavailable', 'unknown', 'off'] }}"
+                then:
+                  - stop: Kodi is unavailable; reconnecting Kodi retries the stop.
+              # Kodi can swallow transport/protocol exceptions. Keep the marker
+              # until its state confirms idle, rather than assuming a call worked.
               - action: media_player.media_stop
                 target:
                   entity_id: "{{ player_entity }}"
@@ -198,18 +229,13 @@ actions:
           - action: input_text.set_value
             target:
               entity_id: "{{ session_entity }}"
-            data:
-              value: "{{ current_tag }}"
+            # Rendered as a whole mapping so an ID such as "1.50" stays text.
+            data: "{{ {'value': ids.current} }}"
           - action: kodi.call_method
             target:
               entity_id: "{{ player_entity }}"
             data:
               method: Player.Open
-              item: >-
-                {% if movie.get('movieid') is integer and movie.get('movieid') is not boolean and movie.get('movieid') > 0 %}
-                  {{ {'movieid': movie.get('movieid')} }}
-                {% else %}
-                  {{ {'file': movie.get('file')} }}
-                {% endif %}
+              item: "{{ item }}"
               options:
                 resume: false

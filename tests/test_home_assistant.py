@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TAG = 'sensor.movie_time_selected_tag'
 PLAYER = 'media_player.kodi'
 SESSION = 'input_text.movie_time_active_tag'
+STOPPING = '⏹'
 INPUTS = {
     'tag_sensor': TAG,
     'play_button': 'binary_sensor.movie_time_play_button',
@@ -26,7 +27,9 @@ INPUTS = {
     'stop_button': 'binary_sensor.movie_time_stop_button',
     'kodi_player': PLAYER,
     'session_helper': SESSION,
-    'movies': {'movie-a': {'movieid': 123}, 'movie-b': {'file': 'smb://server/B.mkv'}},
+    'movies': {'movie-a': {'movieid': 123}, 'movie-b': {'file': 'smb://server/B.mkv'},
+               # Numeric-looking IDs, including an unquoted YAML key.
+               '1234': {'movieid': 7}, 42: {'movieid': 8}, '1.50': {'movieid': 9}},
 }
 
 
@@ -146,14 +149,33 @@ async def test_reconnect_held_case_does_not_restart(rig):
 async def test_case_changed_during_disconnect_stops_without_autoplay(rig, tag):
     rig.states(tag=tag, active='movie-a', player='playing')
     await rig.run(before='unavailable')
-    assert service_names(rig) == ['media_player.media_stop', 'input_text.set_value']
+    assert service_names(rig) == ['input_text.set_value', 'media_player.media_stop',
+                                  'input_text.set_value']
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize('kind', ['offline', 'startup', 'kodi_reconnected'])
+@pytest.mark.parametrize('kind', ['offline', 'startup'])
 async def test_outage_and_restart_stop_owned_session(rig, kind):
     rig.states(active='movie-a', player='playing')
     await rig.run(kind)
+    assert rig.hass.states.get(SESSION).state == ''
+    assert rig.hass.states.get(PLAYER).state == 'idle'
+
+
+@pytest.mark.asyncio
+async def test_brief_kodi_dropout_keeps_inserted_movie_playing(rig):
+    rig.states(active='movie-a', player='playing')
+    await rig.run('kodi_reconnected')
+    assert rig.calls == []
+    assert rig.hass.states.get(SESSION).state == 'movie-a'
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('tag', ['', 'movie-b', 'not-mapped', 'unavailable'])
+async def test_kodi_reconnect_stops_session_for_changed_case(rig, tag):
+    rig.states(tag=tag, active='movie-a', player='playing')
+    await rig.run('kodi_reconnected')
+    assert 'kodi.call_method' not in service_names(rig)
     assert rig.hass.states.get(SESSION).state == ''
     assert rig.hass.states.get(PLAYER).state == 'idle'
 
@@ -179,6 +201,37 @@ async def test_old_queued_selection_cannot_open_current_movie(rig):
     rig.states(tag='movie-b', active='movie-a', player='playing')
     await rig.run(before='', after='movie-a')
     assert rig.calls == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('player', ['playing', 'paused'])
+async def test_queued_reinsert_does_not_restart_current_movie(rig, player):
+    # A -> '' -> A queued behind a slow stop: the '' -> A run must not reopen A.
+    rig.states(tag='movie-a', active='movie-a', player=player)
+    await rig.run(before='', after='movie-a')
+    assert rig.calls == []
+
+
+@pytest.mark.asyncio
+async def test_reinsert_after_movie_ended_starts_again(rig):
+    rig.states(tag='movie-a', active='movie-a', player='idle')
+    await rig.run(before='')
+    assert service_names(rig) == ['input_text.set_value', 'kodi.call_method']
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('tag, movieid', [('1234', 7), ('42', 8), ('1.50', 9)])
+async def test_numeric_tag_ids_stay_text(rig, tag, movieid):
+    rig.states(tag=tag)
+    await rig.run()
+    assert rig.calls[1][2]['item'] == {'movieid': movieid}
+    assert rig.hass.states.get(SESSION).state == tag
+    await rig.run('pause')
+    assert service_names(rig)[-1] == 'media_player.media_pause'
+    rig.hass.states.async_set(TAG, '')
+    await rig.run(before=tag)
+    assert rig.hass.states.get(SESSION).state == ''
+    assert rig.hass.states.get(PLAYER).state == 'idle'
 
 
 @pytest.mark.asyncio
@@ -212,10 +265,12 @@ async def test_failed_stop_retains_session_for_reconnect(rig):
     rig.control.fail_stop = True
     with pytest.raises(HomeAssistantError):
         await rig.run('stop')
-    assert rig.hass.states.get(SESSION).state == 'movie-a'
+    assert rig.hass.states.get(SESSION).state == STOPPING
     rig.control.fail_stop = False
+    # The case is still inserted, but the unconfirmed Stop is still retried.
     await rig.run('kodi_reconnected')
     assert rig.hass.states.get(SESSION).state == ''
+    assert rig.hass.states.get(PLAYER).state == 'idle'
 
 
 @pytest.mark.asyncio
@@ -223,16 +278,20 @@ async def test_silent_kodi_stop_failure_keeps_cleanup_record(rig):
     rig.states(active='movie-a', player='playing')
     rig.control.silent_stop_failure = True
     await rig.run('stop')
-    assert rig.hass.states.get(SESSION).state == 'movie-a'
+    assert rig.hass.states.get(SESSION).state == STOPPING
     assert rig.hass.states.get(PLAYER).state == 'playing'
+    rig.control.silent_stop_failure = False
+    await rig.run('stop')
+    assert service_names(rig).count('input_text.set_value') == 2  # Marked once.
+    assert rig.hass.states.get(SESSION).state == ''
 
 
 @pytest.mark.asyncio
 async def test_stop_while_kodi_unavailable_retries_on_reconnect(rig):
     rig.states(tag='', active='movie-a', player='unavailable')
     await rig.run('selection', before='movie-a')
-    assert rig.calls == []
-    assert rig.hass.states.get(SESSION).state == 'movie-a'
+    assert service_names(rig) == ['input_text.set_value']
+    assert rig.hass.states.get(SESSION).state == STOPPING
     rig.hass.states.async_set(PLAYER, 'playing')
     await rig.run('kodi_reconnected')
     assert rig.hass.states.get(SESSION).state == ''
@@ -275,7 +334,7 @@ async def test_removal_waits_behind_in_flight_open_then_stops(rig):
     await asyncio.sleep(0)
     rig.control.open_gate.set()
     await asyncio.gather(insert, remove)
-    assert service_names(rig) == ['input_text.set_value', 'kodi.call_method',
+    assert service_names(rig) == ['input_text.set_value', 'kodi.call_method', 'input_text.set_value',
                                   'media_player.media_stop', 'input_text.set_value']
     assert rig.hass.states.get(PLAYER).state == 'idle'
 

@@ -40,7 +40,8 @@ python tests/prepare_compile.py
 esphome compile .test-build/movie-player.yaml
 ```
 
-For the Home Assistant tests use Python 3.14.2+ and `requirements-test.txt`.
+For the Home Assistant tests use Python 3.14.2+ and
+`pip install -r requirements-test.txt homeassistant==2026.9.1`.
 Install ESPHome 2026.8.2 in a separate Python 3.12 environment. The compile helper
 creates an isolated build using dummy credentials; never flash that test binary.
 Original project attribution and GPL licensing are retained in [LICENSE](LICENSE).
