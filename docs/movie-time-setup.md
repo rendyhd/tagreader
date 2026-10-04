@@ -20,6 +20,7 @@ for your printed DVD/Blu-ray player. Kodi plays the movies; the reader selects t
 | Insert an unknown case | Do not start anything; stop the previous Movie Time session |
 | Reconnect/reboot | Do not automatically start a movie; press Play or reinsert |
 | Kodi briefly disconnects | Keep playing if the same case is still inserted |
+| Reader briefly loses Wi-Fi | Keep playing; stop on reconnect if the case was removed, or after 3 minutes offline |
 
 The reader waits `insertion_delay_ms` (150 ms) before selecting a new case and
 `removal_delay_ms` (1500 ms) after a removal report before clearing it. The PN532
@@ -74,6 +75,8 @@ integration, device entities and logs.
 Check these entities before enabling movie playback:
 
 1. **Reader Healthy** is on. On boot the I²C scan should show the PN532 at **0x24**.
+   **WiFi Signal** is −70 dBm or better *in the player's final spot*; a TV cabinet
+   or the back of a TV can cost 20–30 dB.
 2. **Selected Tag** changes when you insert a case and becomes empty after removal.
 3. **Selected UID** shows the physical tag UID for troubleshooting.
 4. **Play Button / Pause Button / Stop Button** each change off → on → off.
@@ -185,9 +188,9 @@ before final assembly, then repeat with the enclosure closed:
 - Swap A directly for B: B starts, and removing B stops it.
 - Try an unmapped tag: it starts nothing.
 - Unplug/reconnect the reader while its movie plays: HA stops the owned session
-  after the reader has been unavailable for three seconds. Reconnecting does not
-  autoplay. If the case was removed during a shorter interruption, the empty
-  selected state on reconnect also stops it.
+  after the reader has been unavailable for the automation's offline delay
+  (3 minutes by default). Reconnecting does not autoplay. If the case was removed
+  during a shorter interruption, the empty selected state on reconnect stops it.
 - Restart HA during a session: the helper lets the automation stop the old
   session instead of replaying it automatically.
 - Disconnect Kodi briefly while A plays: when it reconnects with A still inserted,
@@ -233,6 +236,7 @@ when pressed. Do not use two legs permanently joined inside a four-leg switch.
 | Stops with case still inserted | Watch Selected Tag and Reader Healthy; improve sticker alignment/read distance and wiring. A longer removal delay can mask brief loss but cannot fix bad reception. |
 | Sustained PN532 communication failure | Selection clears after warnings last as long as the removal delay (1.5 seconds by default); fix the connection, then remove and reinsert the case. No automatic recovery claim for a failed PN532 setup. |
 | Buzzer silent, Test LED works | Use Test Buzzer, verify D7 and GND, and confirm passive buzzer type. Issue #305 has no confirmed universal fix; compilation is not an acoustic test. |
+| Online shows Disconnected, Uptime keeps counting | The reader stayed on but lost Wi-Fi. Check **WiFi Signal** in the player's final spot: −70 dBm or better is reliable, below about −80 dBm drops are expected. Move the player or an access point, and keep the D1 mini's antenna end (opposite the USB socket) clear of metal, the TV and the PN532. |
 | Crashes when tag stays inserted | Monitor Uptime and Free Heap. Keep the PN532 apart from the D1 antenna; your enclosure already separates the boards. Test a different power cable and an ordinary NTAG sticker. |
 | Button events missing | Check each binary sensor; Stop needs its external 10 kΩ to 3V3. Use the new firmware's button definitions. |
 | Scan beep but wrong/no movie | Feedback means NFC detection; inspect the HA automation trace and test Player.Open directly. |

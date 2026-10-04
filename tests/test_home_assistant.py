@@ -347,7 +347,7 @@ async def test_triggers_use_only_selected_reader_and_press_edges(rig):
         assert t['from'] == 'off' and t['to'] == 'on'
         assert t['entity_id'] == [INPUTS[f'{kind}_button']]
     offline = next(t for t in triggers if t['id'] == 'offline')
-    assert offline['for'].total_seconds() == 3
+    assert offline['for'].total_seconds() == 180
 
 
 @pytest.mark.asyncio
