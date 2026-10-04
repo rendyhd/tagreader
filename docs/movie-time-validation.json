@@ -1,0 +1,43 @@
+{
+  "review_date": "2026-09-08",
+  "last_validated": "2026-10-04",
+  "base_commit": "a8bb6fc43e5a687503d1b43edb32855d0de7050a",
+  "issues_inventoried": 179,
+  "open_issues_triaged": 42,
+  "open_pull_requests_reviewed": 6,
+  "esphome_version": "2026.8.2",
+  "esp8266_arduino_version": "3.1.2",
+  "firmware_compiled": true,
+  "movie_firmware": {
+    "ram_used_bytes": 36028,
+    "ram_available_bytes": 81920,
+    "flash_used_bytes": 483171,
+    "flash_available_bytes": 1044464
+  },
+  "upstream_baseline": {
+    "ram_used_bytes": 37144,
+    "ram_available_bytes": 81920,
+    "flash_used_bytes": 459973,
+    "flash_available_bytes": 1044464
+  },
+  "memory_note": "Linker figures only; runtime heap, RF reliability and acoustic response require physical tests. Movie build includes API encryption; upstream baseline does not.",
+  "cpp_sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "cpp_insertion_removal_cycles": 10000,
+  "home_assistant_tests": {
+    "2026.9.1": {
+      "passed": 42,
+      "runner": "Home Assistant blueprint schemas, real script engine and triggers; simulated Kodi services"
+    },
+    "2026.8.0": {
+      "passed": 42,
+      "runner": "Home Assistant blueprint schemas, real script engine and triggers; simulated Kodi services"
+    }
+  },
+  "hardware_tested": false,
+  "device_flashed": false,
+  "live_home_assistant_modified": false,
+  "evidence_note": "Re-run the checks and update these figures with each change; the Movie Time checks workflow is the current evidence."
+}

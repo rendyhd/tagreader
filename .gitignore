@@ -8,3 +8,7 @@
 **/src/
 **/platformio.ini
 /secrets.yaml
+/.test-build/
+/.pytest_cache/
+**/__pycache__/
+/.venv*/

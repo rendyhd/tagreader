@@ -1,0 +1,250 @@
+blueprint:
+  name: Movie Time — cases and buttons for Kodi
+  description: >-
+    Insert a mapped case to start its movie. Play resumes, or starts the selected
+    movie after Stop. Pause pauses. Stop, removal or a reader outage stops only
+    the session this automation started. Reconnection never automatically starts
+    a movie. Create one Text helper (maximum length 128) to remember the active
+    session; select it below. Use movie-player.yaml, not the legacy firmware.
+  domain: automation
+  homeassistant:
+    min_version: 2026.8.0
+  input:
+    tag_sensor:
+      name: Movie Time — Selected Tag
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+              integration: esphome
+    play_button:
+      name: Movie Time — Play Button
+      selector:
+        entity:
+          filter:
+            - domain: binary_sensor
+              integration: esphome
+    pause_button:
+      name: Movie Time — Pause Button
+      selector:
+        entity:
+          filter:
+            - domain: binary_sensor
+              integration: esphome
+    stop_button:
+      name: Movie Time — Stop Button
+      selector:
+        entity:
+          filter:
+            - domain: binary_sensor
+              integration: esphome
+    kodi_player:
+      name: Kodi player
+      selector:
+        entity:
+          filter:
+            - domain: media_player
+              integration: kodi
+    session_helper:
+      name: Active movie — Text helper
+      description: Create a dedicated Text helper with maximum length 128. Leave it empty.
+      selector:
+        entity:
+          filter:
+            - domain: input_text
+    movies:
+      name: Tag IDs and movies
+      description: >-
+        Map each Selected Tag value to either {movieid: 123} for a Kodi library
+        movie, or {file: "smb://server/movies/movie.mkv"} for a path Kodi can play.
+        An optional title is for your reference. These are examples: replace them.
+      default: {}
+      selector:
+        object: {}
+    offline_delay:
+      name: Stop after the reader is offline for
+      description: >-
+        A Wi-Fi drop shorter than this keeps the movie playing. When the reader
+        reconnects, a case removed or swapped meanwhile still stops it.
+      default:
+        minutes: 3
+      selector:
+        duration: {}
+
+# Queue actual player calls so a quick removal cannot overtake an in-flight open.
+# Selection and button commands are rechecked against current state on execution.
+mode: queued
+max: 20
+max_exceeded: warning
+
+triggers:
+  - trigger: state
+    entity_id: !input tag_sensor
+    not_to:
+      - unavailable
+      - unknown
+    id: selection
+  - trigger: state
+    entity_id: !input tag_sensor
+    to: unavailable
+    for: !input offline_delay
+    id: offline
+  - trigger: state
+    entity_id: !input play_button
+    from: "off"
+    to: "on"
+    id: play
+  - trigger: state
+    entity_id: !input pause_button
+    from: "off"
+    to: "on"
+    id: pause
+  - trigger: state
+    entity_id: !input stop_button
+    from: "off"
+    to: "on"
+    id: stop
+  - trigger: homeassistant
+    event: start
+    id: startup
+  - trigger: state
+    entity_id: !input kodi_player
+    from:
+      - unavailable
+      - unknown
+      - "off"
+    not_to:
+      - unavailable
+      - unknown
+    id: kodi_reconnected
+  - trigger: event
+    event_type: kodi_call_method_result
+    event_data:
+      entity_id: !input kodi_player
+      result_ok: false
+      input:
+        method: Player.Open
+    id: open_error
+
+actions:
+  - variables:
+      tag_entity: !input tag_sensor
+      player_entity: !input kodi_player
+      session_entity: !input session_helper
+      movies: !input movies
+      # Marks a stop Kodi has not confirmed yet. The reader only publishes
+      # printable ASCII, so this can never be a tag ID.
+      stopping: "⏹"
+  - variables:
+      # Rendered variables are parsed as Python literals, so an ID such as
+      # "1234" would turn into a number. Inside a mapping the IDs stay text.
+      ids: "{{ {'current': states(tag_entity), 'active': states(session_entity)} }}"
+      player_state: "{{ states(player_entity) }}"
+  - variables:
+      # Keys are compared as text, so an unquoted numeric key such as 1234 matches.
+      movie: >-
+        {% set ns = namespace(found={}) %}
+        {% for key, value in (movies.items() if movies is mapping else []) if key | string == ids.current %}{% set ns.found = value %}{% endfor %}
+        {{ ns.found }}
+      active_movie: >-
+        {% set ns = namespace(found={}) %}
+        {% for key, value in (movies.items() if movies is mapping else []) if key | string == ids.active %}{% set ns.found = value %}{% endfor %}
+        {{ ns.found }}
+      has_session: "{{ ids.active not in ['', 'unknown', 'unavailable'] }}"
+  - variables:
+      # What Player.Open receives; empty when the mapping has no usable movie.
+      item: >-
+        {% set m = movie if movie is mapping else {} %}
+        {% set mid = m.get('movieid') %}
+        {% if mid is integer and mid is not boolean and mid > 0 %}{{ {'movieid': mid} }}
+        {% elif m.get('file') is string and m.get('file') | length > 0 %}{{ {'file': m.get('file')} }}
+        {% else %}{{ {} }}{% endif %}
+      valid_movie: "{{ item | length > 0 }}"
+      command: >-
+        {% if trigger.id == 'open_error' %}
+          {% set failed = trigger.event.data.get('input', {}).get('params', {}).get('item', {}) %}
+          {% set matches = active_movie is mapping and
+             ((failed.get('movieid') is not none and failed.get('movieid') == active_movie.get('movieid'))
+              or (failed.get('file') is not none and failed.get('file') == active_movie.get('file'))) %}
+          {{ 'stop' if has_session and matches else 'ignore' }}
+        {% elif trigger.id in ['stop', 'offline', 'startup'] %}
+          {{ 'stop' if has_session else 'ignore' }}
+        {% elif trigger.id == 'kodi_reconnected' %}
+          {# A brief Kodi dropout must not stop the inserted case's movie. An
+             unconfirmed stop or a case changed meanwhile is still cleaned up. #}
+          {{ 'stop' if has_session and (ids.active != ids.current or not valid_movie) else 'ignore' }}
+        {% elif ids.current in ['', 'unknown', 'unavailable'] or not valid_movie %}
+          {{ 'stop' if has_session else 'ignore' }}
+        {% elif trigger.id == 'pause' %}
+          {{ 'pause' if has_session and ids.active == ids.current and player_state == 'playing' else 'ignore' }}
+        {% elif trigger.id == 'play' %}
+          {% if has_session and ids.active == ids.current and player_state == 'paused' %}resume
+          {% elif has_session and ids.active == ids.current and player_state == 'playing' %}ignore
+          {% else %}open{% endif %}
+        {% elif trigger.id == 'selection' %}
+          {% if trigger.from_state is none or trigger.from_state.state in ['unknown', 'unavailable'] %}
+            {{ 'stop' if has_session and ids.active != ids.current else 'ignore' }}
+          {% elif trigger.to_state.state != ids.current or trigger.from_state.state == ids.current %}ignore
+          {# A queued run must not restart the movie this session is already showing. #}
+          {% elif has_session and ids.active == ids.current and player_state in ['playing', 'paused'] %}ignore
+          {% else %}open{% endif %}
+        {% else %}ignore{% endif %}
+  - choose:
+      - conditions: "{{ command | trim == 'stop' }}"
+        sequence:
+          - if: "{{ not is_state(player_entity, 'idle') }}"
+            then:
+              # Mark the stop before asking Kodi. If Kodi is unreachable or does
+              # not confirm it, reconnecting Kodi retries it, even with the case in.
+              - if: "{{ ids.active != stopping }}"
+                then:
+                  - action: input_text.set_value
+                    target:
+                      entity_id: "{{ session_entity }}"
+                    data:
+                      value: "{{ stopping }}"
+              - if: "{{ states(player_entity) in ['unavailable', 'unknown', 'off'] }}"
+                then:
+                  - stop: Kodi is unavailable; reconnecting Kodi retries the stop.
+              # Kodi can swallow transport/protocol exceptions. Keep the marker
+              # until its state confirms idle, rather than assuming a call worked.
+              - action: media_player.media_stop
+                target:
+                  entity_id: "{{ player_entity }}"
+              - wait_template: "{{ is_state(player_entity, 'idle') }}"
+                timeout: "00:00:03"
+                continue_on_timeout: false
+          - action: input_text.set_value
+            target:
+              entity_id: "{{ session_entity }}"
+            data:
+              value: ""
+      - conditions: "{{ command | trim == 'pause' }}"
+        sequence:
+          - action: media_player.media_pause
+            target:
+              entity_id: "{{ player_entity }}"
+      - conditions: "{{ command | trim == 'resume' }}"
+        sequence:
+          - action: media_player.media_play
+            target:
+              entity_id: "{{ player_entity }}"
+      - conditions: "{{ command | trim == 'open' }}"
+        sequence:
+          - condition: template
+            value_template: "{{ player_state not in ['unavailable', 'unknown', 'off'] }}"
+          # Track the request before sending it: even if the connection drops
+          # during Player.Open, a later stop/reconnect can clean up this session.
+          - action: input_text.set_value
+            target:
+              entity_id: "{{ session_entity }}"
+            # Rendered as a whole mapping so an ID such as "1.50" stays text.
+            data: "{{ {'value': ids.current} }}"
+          - action: kodi.call_method
+            target:
+              entity_id: "{{ player_entity }}"
+            data:
+              method: Player.Open
+              item: "{{ item }}"
+              options:
+                resume: false
