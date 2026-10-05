@@ -1,15 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100">
 <rect width="1600" height="1100" fill="white"/>
 <text x="50" y="61" font-family="Arial,sans-serif" font-size="36" font-weight="bold" fill="#172e43" text-anchor="start">1. Complete wiring and the exact D1 mini pads</text>
-<text x="50" y="102" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">USB powers the D1 mini. A separate fixed, regulated 12 V DC adapter powers the reader.</text>
+<text x="50" y="102" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">ONE wall adapter: 12 V feeds the reader and your pictured 12/24 V-to-5 V, 3 A USB-C converter.</text>
 <polyline points="50,126 1550,126" fill="none" stroke="#cfdae3" stroke-width="2" stroke-linejoin="round" />
 <text x="50" y="1074" font-family="Arial,sans-serif" font-size="17" font-weight="normal" fill="#172e43" text-anchor="start">LOLIN D1 mini V4 / photographed Wiegand reader | proposed build; not bench-tested</text>
 <text x="1505" y="1074" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">1/5</text>
 <rect x="50" y="175" width="360" height="165" rx="10" fill="#f1f6fa" stroke="#b6c9d6" stroke-width="2"/>
-<text x="75" y="210" font-family="Arial,sans-serif" font-size="25" font-weight="bold" fill="#172e43" text-anchor="start">Reader&#x27;s 12 V DC adapter</text>
-<text x="75" y="249" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">+12 V -&gt; reader RED only</text>
+<text x="75" y="210" font-family="Arial,sans-serif" font-size="25" font-weight="bold" fill="#172e43" text-anchor="start">One 12 V DC adapter</text>
+<text x="75" y="249" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">+12 V -&gt; both RED wires</text>
 <text x="75" y="284" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Negative -&gt; common GND</text>
 <text x="75" y="316" font-family="Arial,sans-serif" font-size="17" font-weight="normal" fill="#172e43" text-anchor="start">Plug-in supply; no mains wiring</text>
+<rect x="500" y="175" width="390" height="165" rx="10" fill="#f1f6fa" stroke="#b6c9d6" stroke-width="2"/>
+<text x="525" y="210" font-family="Arial,sans-serif" font-size="24" font-weight="bold" fill="#172e43" text-anchor="start">Fixed 12 V -&gt; 5 V converter</text>
+<text x="525" y="249" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">RED IN: +12 V; BLACK IN: GND</text>
+<text x="525" y="284" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">5 V USB-C plug -&gt; D1 mini</text>
+<text x="525" y="316" font-family="Arial,sans-serif" font-size="17" font-weight="normal" fill="#172e43" text-anchor="start">Label: input 12/24 V; output 5 V 3 A</text>
+<polyline points="440,259 500,259" fill="none" stroke="#c03432" stroke-width="4" stroke-linejoin="round" />
+<circle cx="440" cy="259" r="6" fill="#c03432"/>
+<polyline points="500,302 480,302 480,910" fill="none" stroke="#344454" stroke-width="4" stroke-linejoin="round" />
 <rect x="50" y="400" width="360" height="360" rx="10" fill="#f1f6fa" stroke="#b6c9d6" stroke-width="2"/>
 <text x="75" y="440" font-family="Arial,sans-serif" font-size="27" font-weight="bold" fill="#172e43" text-anchor="start">Outdoor reader cable</text>
 <text x="75" y="482" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#c03432" text-anchor="start">RED</text>
@@ -75,8 +83,9 @@
 <text x="1355" y="623" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="end">3V3</text>
 <rect x="1200" y="680" width="75" height="58" rx="5" fill="#626f7c" stroke="#626f7c" stroke-width="2"/>
 <text x="1240" y="785" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="#172e43" text-anchor="middle">USB-C</text>
-<text x="1240" y="819" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="middle">5 V USB wall charger</text>
+<text x="1240" y="819" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="middle">5 V USB from converter</text>
 <polyline points="1237,738 1237,756" fill="none" stroke="#d26916" stroke-width="9" stroke-linejoin="round" />
+<polyline points="890,300 1020,300 1020,785 1170,785 1170,750 1237,750" fill="none" stroke="#d26916" stroke-width="4" stroke-linejoin="round" stroke-dasharray="9 6"/>
 <polyline points="890,540 965,540 965,411 1102,411" fill="none" stroke="#2760c5" stroke-width="4" stroke-linejoin="round" />
 <text x="923" y="398" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#2760c5" text-anchor="start">OUT1</text>
 <polyline points="890,581 988,581 988,452 1102,452" fill="none" stroke="#2760c5" stroke-width="4" stroke-linejoin="round" />
@@ -87,11 +96,12 @@
 <polyline points="890,655 1008,655 1008,616 1102,616" fill="none" stroke="#d26916" stroke-width="4" stroke-linejoin="round" />
 <polyline points="1373,616 1450,616 1450,870 870,870 870,760" fill="none" stroke="#a738a3" stroke-width="4" stroke-linejoin="round" />
 <circle cx="460" cy="910" r="6" fill="#344454"/>
+<circle cx="480" cy="910" r="6" fill="#344454"/>
 <circle cx="700" cy="910" r="6" fill="#344454"/>
 <polyline points="410,515 430,515 430,910 460,910" fill="none" stroke="#344454" stroke-width="4" stroke-linejoin="round" />
 <polyline points="410,552 425,552 425,930 700,930 700,910" fill="none" stroke="#8a5036" stroke-width="4" stroke-linejoin="round" />
 <polyline points="700,760 700,910" fill="none" stroke="#344454" stroke-width="4" stroke-linejoin="round" />
-<text x="720" y="940" font-family="Arial,sans-serif" font-size="19" font-weight="normal" fill="#172e43" text-anchor="start">COMMON GND: adapter -, reader BLACK/BROWN, interface, D1 mini</text>
+<text x="590" y="940" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">COMMON GND: adapter -, converter BLACK, reader BLACK/BROWN, interface, board</text>
 <rect x="50" y="962" width="1500" height="84" rx="10" fill="#fff1d9" stroke="#fff1d9" stroke-width="2"/>
 <text x="70" y="994" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Orient your board by its printed labels. Reader D1 is NOT board D1; follow the mapping above.</text>
 <text x="70" y="1024" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">12 V never goes to VBUS, 3V3 or GPIO. Leave gate motor/relay wiring to the existing HA gate controller.</text>

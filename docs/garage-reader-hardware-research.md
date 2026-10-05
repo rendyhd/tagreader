@@ -55,9 +55,9 @@ This replaces both NPN input circuits. Power wiring remains as in the main guide
 
 | Connection | Destination |
 |---|---|
-| Converter HV | Regulated 5 V from the buck |
+| Converter HV | D1 mini VBUS, powered by the fixed 5 V USB-C power converter |
 | Converter LV | D1 mini 3V3 |
-| Converter GND | Common reader/buck/D1 mini ground |
+| Converter GND | Common reader/power-converter/D1 mini ground |
 | Reader green D0 | Converter HV1 |
 | Converter LV1 | D1 mini D1 / GPIO5 / printed 5 SCL |
 | Reader white D1 | Converter HV2 |

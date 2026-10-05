@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100">
 <rect width="1600" height="1100" fill="white"/>
 <text x="50" y="61" font-family="Arial,sans-serif" font-size="36" font-weight="bold" fill="#172e43" text-anchor="start">5. Parts, soldering order and first power-up</text>
-<text x="50" y="102" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">You already have the reader and D1 mini. The interface parts and reader power supply are still needed.</text>
+<text x="50" y="102" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Single-adapter build: use your purchased 12/24 V-input, 5 V / 3 A-output converter with USB-C plug.</text>
 <polyline points="50,126 1550,126" fill="none" stroke="#cfdae3" stroke-width="2" stroke-linejoin="round" />
 <text x="50" y="1074" font-family="Arial,sans-serif" font-size="17" font-weight="normal" fill="#172e43" text-anchor="start">LOLIN D1 mini V4 / photographed Wiegand reader | proposed build; not bench-tested</text>
 <text x="1505" y="1074" font-family="Arial,sans-serif" font-size="18" font-weight="normal" fill="#172e43" text-anchor="start">5/5</text>
@@ -23,11 +23,11 @@
 <text x="55" y="462" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">1</text>
 <text x="95" y="462" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Matching DC barrel-to-screw adapter, if needed</text>
 <text x="55" y="497" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">1</text>
-<text x="95" y="497" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">5 V USB charger + USB-C cable for the D1 mini</text>
+<text x="95" y="497" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Purchased fixed 5 V / 3 A USB-C converter</text>
 <text x="55" y="532" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">-</text>
 <text x="95" y="532" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">Insulated wire, solder, flux, heat-shrink, enclosure</text>
-<text x="55" y="610" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">Reader current rating is unknown: choose a regulated</text>
-<text x="55" y="640" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">12 V supply with at least 1 A available for this reader.</text>
+<text x="55" y="610" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">12 V supply capacity must cover reader + converter.</text>
+<text x="55" y="640" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">5 V / 3 A is output capacity, not constant current draw.</text>
 <text x="55" y="686" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">Resistor identification (4-band, gold tolerance)</text>
 <text x="55" y="723" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">10k: brown - black - orange - gold</text>
 <text x="55" y="755" font-family="Arial,sans-serif" font-size="21" font-weight="normal" fill="#172e43" text-anchor="start">47k: yellow - violet - orange - gold</text>
@@ -43,7 +43,7 @@
 <text x="528" y="927" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="middle">B</text>
 <polyline points="576,868 576,903" fill="none" stroke="#172e43" stroke-width="5" stroke-linejoin="round" />
 <text x="576" y="927" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#172e43" text-anchor="middle">C</text>
-<text x="850" y="175" font-family="Arial,sans-serif" font-size="27" font-weight="bold" fill="#172e43" text-anchor="start">Build with both supplies unplugged</text>
+<text x="850" y="175" font-family="Arial,sans-serif" font-size="27" font-weight="bold" fill="#172e43" text-anchor="start">Build with adapter and USB unplugged</text>
 <text x="850" y="215" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">1. Solder the D1 mini headers, or use short wires</text>
 <text x="850" y="244" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   directly on the labelled pads shown on page 1.</text>
 <text x="850" y="273" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">2. Insert resistors and diodes per page 3. Resistors</text>
@@ -53,14 +53,14 @@
 <text x="850" y="389" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">4. Add INSULATED wires on the copper side using</text>
 <text x="850" y="418" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   the page 4 groups. No stripboard / common rows.</text>
 <text x="850" y="447" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">5. Connect the seven interface wire pads below.</text>
-<text x="850" y="476" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">6. Connect RED to adapter +12 V. Adapter negative,</text>
-<text x="850" y="505" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   reader BLACK/BROWN and board GND join together.</text>
-<text x="850" y="534" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">7. Heat-shrink BLUE and YELLOW separately. Secure</text>
-<text x="850" y="563" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   the cable; mount the interface/controller indoors.</text>
-<text x="850" y="592" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">8. Inspect both sides closely for shorts and loose</text>
-<text x="850" y="621" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   strands. Neither supply is connected yet.</text>
-<text x="850" y="650" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">9. Flash garage-reader.yaml over USB. Then power</text>
-<text x="850" y="679" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   the reader with 12 V. Keep the common GND wire.</text>
+<text x="850" y="476" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">6. +12 V -&gt; reader RED + converter RED. Negative</text>
+<text x="850" y="505" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   joins converter BLACK, reader BLACK/BROWN, GND.</text>
+<text x="850" y="534" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">7. Insulate BLUE/YELLOW. Keep controller, converter</text>
+<text x="850" y="563" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   and interface indoors; secure all cables.</text>
+<text x="850" y="592" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">8. Inspect for shorts. Check actual converter label</text>
+<text x="850" y="621" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   says 12/24 V input, 5 V output before power-up.</text>
+<text x="850" y="650" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">9. Flash with PC USB; unplug converter USB first.</text>
+<text x="850" y="679" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">   Then swap PC USB for converter USB and power 12 V.</text>
 <text x="850" y="708" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">10. Check Last Frame Bits = 34 and Last Card in HA.</text>
 <text x="850" y="737" font-family="Arial,sans-serif" font-size="20" font-weight="normal" fill="#172e43" text-anchor="start">    Try a notification before enabling gate actions.</text>
 <text x="850" y="809" font-family="Arial,sans-serif" font-size="23" font-weight="bold" fill="#172e43" text-anchor="start">Interface pads -&gt; external wires</text>

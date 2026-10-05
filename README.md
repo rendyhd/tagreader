@@ -9,8 +9,10 @@ Adding or naming a card alone grants no access. Permissions live in Home Assista
 
 For detailed soldering, use the [five-page printable guide](output/pdf/garage-reader-soldering-guide.pdf).
 It includes exact board pads, both circuits, perfboard placement and mirrored
-solder-side wire groups. Power the D1 mini by USB and the reader with a separate
-fixed regulated 12 V adapter; no adjustable buck converter is needed.
+solder-side wire groups. Use **one fixed regulated 12 V adapter**: split its DC
+output between the reader and your **12/24 V-to-5 V, 3 A USB-C converter**.
+The converter's USB-C plug powers the D1 mini directly. No second wall adapter
+or additional USB cable is needed for normal operation.
 
 ![Wiring diagram](docs/garage-reader-wiring.svg)
 

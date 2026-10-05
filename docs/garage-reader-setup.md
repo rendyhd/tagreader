@@ -25,24 +25,43 @@ with the movie reader's PN532 are not necessarily compatible with this reader.
 Use the [five-page printable wiring and soldering guide](../output/pdf/garage-reader-soldering-guide.pdf).
 It shows your exact D1 mini pads, both electrical circuits, component placement,
 the mirrored solder side, and the soldering sequence. It keeps your existing
-reader and controller. The new drawings use **USB power for the D1 mini and a
-separate fixed regulated 12 V adapter for the reader**, so an adjustable buck
-converter and a meter to set its output are not needed.
+reader and controller. The drawings now use **one fixed regulated 12 V adapter**
+for both the reader and your purchased converter. The converter shown in your
+screenshot is labelled **12/24 V input, 5 V / 3 A output**, with red/black input
+wires and a **male USB-C output plug**. Plug that directly into the D1 mini;
+no second wall adapter or separate USB cable is needed for normal operation.
+It has a fixed output, so there is no adjustment screw to set with a meter.
 
 The interface parts and reader power supply are **additional parts**; the two
 photographed devices alone are not the complete build. The input circuit is a
 proposed design for ordinary 0–12 V signals, not a measured specification of your
 reader or a bench-tested assembly. Having no meter does not establish that direct
-GPIO wiring or a 5 V-only converter would work.
+GPIO wiring would work. The converter supplies power only; it does not replace
+the two NPN data interfaces.
 
 ![Wiring diagram](garage-reader-wiring.svg)
 
-Add a **fixed regulated 12 V DC plug-in supply** for the reader. Its exact current
-rating is unknown; 12 V / 1 A is a conservative starting choice for this reader
-alone, not a verified minimum requirement. Use a barrel-to-screw adapter matching
-the supply connector and its marked polarity if needed. Do not cut into or assemble
-mains wiring. Power the D1 mini using a **5 V USB wall charger and USB-C cable**.
-Connect the DC grounds together as shown.
+Use a **fixed regulated 12 V DC plug-in supply**. Its capacity must cover the
+reader plus the converter's input current for the D1 mini. The reader's draw
+is unknown, so the earlier 12 V / 1 A suggestion is not a verified combined-load
+requirement. A 12 V / 2 A supply provides more capacity for this small build,
+but does not guarantee an unmeasured load. The converter's 5 V / 3 A marking is
+its maximum output capacity, not the D1 mini's constant current draw.
+Use a female barrel-to-screw adapter matching your supply plug and marked polarity.
+Do not cut into or assemble mains wiring. Make the following DC connections with
+the adapter unplugged:
+
+| Connection | Wires / plug |
+|---|---|
+| Adapter positive (+12 V) | Reader RED and converter RED input |
+| Adapter negative (GND) | Reader BLACK, reader BROWN, converter BLACK input, interface GND and D1 mini GND |
+| Converter 5 V output | Its USB-C plug directly into the D1 mini USB-C socket |
+| D1 mini VBUS | Interface pad B2, for the 5 V reader-line bias only |
+
+Use a labelled insulated terminal connector or properly soldered, heat-shrunk
+wire branches to split the +12 V and ground. Multiple wires in one screw terminal
+are acceptable only if that terminal is designed to hold their sizes and number.
+Check the actual converter label against the screenshot when it arrives.
 
 For the complete two-channel interface, obtain:
 
@@ -76,12 +95,17 @@ Both firmware inputs therefore require `inverted: true`. This proposed interface
 handles ordinary 0–12 V logic, including open-collector or driven outputs. It is
 not a certified outdoor lightning/surge isolator. Keep the GPIO wires short.
 
-Power reader red from the adapter's +12 V, and power the D1 mini through USB-C.
+Power reader red and converter red from the adapter's +12 V. The converter's
+fixed 5 V USB-C output powers the D1 mini.
 The board's **VBUS pad supplies the interface's 5 V bias**; do not attach another
-5 V supply to VBUS while USB is connected. Connect adapter negative, reader black,
-reader brown, both emitters and board GND together. Board **3V3** supplies only the
+5 V supply to VBUS while USB is connected. Connect adapter negative, converter
+black, reader black, reader brown, both emitters and board GND together. Board **3V3** supplies only the
 collector pull-ups. Never feed 12 V to VBUS, 3V3 or GPIO. For flashing, the USB cable
-can come from the computer instead of the USB wall charger; keep the common ground.
+must come from the computer instead of the converter: unplug the 12 V adapter,
+remove the converter's USB-C plug, then connect the computer's USB cable.
+After flashing, unplug the computer USB cable, reconnect the converter plug,
+and power the 12 V adapter. Keep the common ground throughout. Never combine
+the converter and computer USB supplies using a splitter.
 
 ## Detailed soldering layout
 
@@ -146,7 +170,7 @@ row 7. Fit **Q2 emitter at J16, base at K16, collector at L16**, flat face towar
 row 17. This assumes the specified 2N3904 pin order; check the supplier's drawing
 before soldering. Do not substitute a BC547 without remapping its legs.
 
-Keep both supplies unplugged throughout soldering. Solder the D1 mini headers
+Keep the 12 V adapter and computer USB unplugged throughout soldering. Solder the D1 mini headers
 provided in your photos, or short insulated wires directly onto the named pads.
 Do not join adjacent header pads. Assemble the perfboard using the PDF's sequence,
 connect the external wires, and cover the blue/yellow reader wire ends separately.
@@ -236,11 +260,12 @@ another scan can recreate that entry. A card can have multiple rights automation
 
 ## Bench checks before enabling door actions
 
-1. With both supplies unplugged, compare every lead and pad group with the
+1. With the 12 V adapter and computer USB unplugged, compare every lead and pad group with the
    drawings. Inspect both sides with good lighting and magnification for solder
    bridges, touching bare leads and loose wire strands. Verify the adapter is
    labelled regulated 12 V DC and match its polarity to the connector labels.
-   Use USB power for the D1 mini; no adjustable buck is needed.
+   Check converter RED is on +12 V and BLACK is on ground. Its label must specify
+   fixed 5 V output. Its USB-C plug powers the D1 mini; no adjustable buck is needed.
 2. **If test equipment becomes available**, check ground continuity and supply
    polarity first. With GPIOs disconnected, measure green/white against black;
    the proposed circuit assumes ordinary 0–12 V logic. Powered collectors should

@@ -51,12 +51,20 @@ class Drawing:
 
 
 def overview():
-    d = Drawing("1. Complete wiring and the exact D1 mini pads", "USB powers the D1 mini. A separate fixed, regulated 12 V DC adapter powers the reader.", 1)
+    d = Drawing("1. Complete wiring and the exact D1 mini pads", "ONE wall adapter: 12 V feeds the reader and your pictured 12/24 V-to-5 V, 3 A USB-C converter.", 1)
     d.rect(50, 175, 360, 165)
-    d.text(75, 210, "Reader's 12 V DC adapter", 25, bold=True)
-    d.text(75, 249, "+12 V -> reader RED only")
+    d.text(75, 210, "One 12 V DC adapter", 25, bold=True)
+    d.text(75, 249, "+12 V -> both RED wires", 20)
     d.text(75, 284, "Negative -> common GND")
     d.text(75, 316, "Plug-in supply; no mains wiring", 17)
+    d.rect(500, 175, 390, 165)
+    d.text(525, 210, "Fixed 12 V -> 5 V converter", 24, bold=True)
+    d.text(525, 249, "RED IN: +12 V; BLACK IN: GND", 20)
+    d.text(525, 284, "5 V USB-C plug -> D1 mini", 20)
+    d.text(525, 316, "Label: input 12/24 V; output 5 V 3 A", 17)
+    d.line([(440, 259), (500, 259)], "#c03432")
+    d.dot(440, 259, "#c03432")
+    d.line([(500, 302), (480, 302), (480, 910)], COL["GND"])
     d.rect(50, 400, 360, 360)
     d.text(75, 440, "Outdoor reader cable", 27, bold=True)
     wires = [("RED", "+12 V", "#c03432"), ("BLACK", "GND", COL["GND"]), ("BROWN", "GND: select WG34", "#8a5036"), ("GREEN", "D0 -> interface IN1", COL["IN1"]), ("WHITE", "D1 -> interface IN2", COL["IN2"]), ("BLUE", "LED: insulate end", "#2760c5"), ("YELLOW", "BEEP: insulate end", "#aa7b00")]
@@ -83,8 +91,9 @@ def overview():
         d.text(1355, y + 7, right[i], 20, bold=i == 7, anchor="end")
     d.rect(1200, 680, 75, 58, "#626f7c", "#626f7c", 5)
     d.text(1240, 785, "USB-C", 22, bold=True, anchor="middle")
-    d.text(1240, 819, "5 V USB wall charger", 21, anchor="middle")
+    d.text(1240, 819, "5 V USB from converter", 21, anchor="middle")
     d.line([(1237, 738), (1237, 756)], COL["5V"], 9)
+    d.line([(890, 300), (1020, 300), (1020, 785), (1170, 785), (1170, 750), (1237, 750)], COL["5V"], 4, dash=True)
     d.line([(890, 540), (965, 540), (965, 411), (1102, 411)], COL["OUT1"])
     d.text(923, 398, "OUT1", 18, COL["OUT1"])
     d.line([(890, 581), (988, 581), (988, 452), (1102, 452)], COL["OUT2"])
@@ -94,11 +103,11 @@ def overview():
     d.line([(410, 302), (460, 302), (460, 910), (1060, 910), (1060, 575), (1102, 575)], COL["GND"])
     d.line([(890, 655), (1008, 655), (1008, 616), (1102, 616)], COL["5V"])
     d.line([(1373, 616), (1450, 616), (1450, 870), (870, 870), (870, 760)], COL["3V3"])
-    for x, y in [(460, 910), (700, 910)]: d.dot(x, y, COL["GND"])
+    for x, y in [(460, 910), (480, 910), (700, 910)]: d.dot(x, y, COL["GND"])
     d.line([(410, 515), (430, 515), (430, 910), (460, 910)], COL["GND"])
     d.line([(410, 552), (425, 552), (425, 930), (700, 930), (700, 910)], "#8a5036")
     d.line([(700, 760), (700, 910)], COL["GND"])
-    d.text(720, 940, "COMMON GND: adapter -, reader BLACK/BROWN, interface, D1 mini", 19)
+    d.text(590, 940, "COMMON GND: adapter -, converter BLACK, reader BLACK/BROWN, interface, board", 18)
     d.note(962, ["Orient your board by its printed labels. Reader D1 is NOT board D1; follow the mapping above.", "12 V never goes to VBUS, 3V3 or GPIO. Leave gate motor/relay wiring to the existing HA gate controller."])
     return d.save("garage-reader-wiring.svg")
 
@@ -260,14 +269,14 @@ def layout(bottom=False):
 
 
 def steps():
-    d=Drawing("5. Parts, soldering order and first power-up", "You already have the reader and D1 mini. The interface parts and reader power supply are still needed.",5)
+    d=Drawing("5. Parts, soldering order and first power-up", "Single-adapter build: use your purchased 12/24 V-input, 5 V / 3 A-output converter with USB-C plug.",5)
     d.text(50,175,"Additional parts",27,bold=True)
-    items=[("2", "2N3904 NPN, TO-92; matching E-B-C pinout"),("2", "1N4148 axial diodes"),("4", "10k ohm resistors, 1/4 W, 1% or 5%"),("2", "47k ohm resistors, 1/4 W, 1% or 5%"),("2", "100k ohm resistors, 1/4 W, 1% or 5%"),("1", "Isolated-pad perfboard, >=24 x 20 holes (2.54 mm)"),("1", "Fixed regulated 12 V DC wall adapter"),("1", "Matching DC barrel-to-screw adapter, if needed"),("1", "5 V USB charger + USB-C cable for the D1 mini"),("-", "Insulated wire, solder, flux, heat-shrink, enclosure")]
+    items=[("2", "2N3904 NPN, TO-92; matching E-B-C pinout"),("2", "1N4148 axial diodes"),("4", "10k ohm resistors, 1/4 W, 1% or 5%"),("2", "47k ohm resistors, 1/4 W, 1% or 5%"),("2", "100k ohm resistors, 1/4 W, 1% or 5%"),("1", "Isolated-pad perfboard, >=24 x 20 holes (2.54 mm)"),("1", "Fixed regulated 12 V DC wall adapter"),("1", "Matching DC barrel-to-screw adapter, if needed"),("1", "Purchased fixed 5 V / 3 A USB-C converter"),("-", "Insulated wire, solder, flux, heat-shrink, enclosure")]
     for i,(qty,item) in enumerate(items):
         d.text(55,217+i*35,qty,23,bold=True)
         d.text(95,217+i*35,item,21)
-    d.text(55,610,"Reader current rating is unknown: choose a regulated",20)
-    d.text(55,640,"12 V supply with at least 1 A available for this reader.",20)
+    d.text(55,610,"12 V supply capacity must cover reader + converter.",20)
+    d.text(55,640,"5 V / 3 A is output capacity, not constant current draw.",20)
     d.text(55,686,"Resistor identification (4-band, gold tolerance)",23,bold=True)
     for i,t in enumerate(["10k: brown - black - orange - gold", "47k: yellow - violet - orange - gold", "100k: brown - black - yellow - gold"]):d.text(55,723+i*32,t,21)
     d.text(55,846,"2N3904 FRONT VIEW",21,bold=True)
@@ -278,8 +287,8 @@ def steps():
     for x,label in [(480,"E"),(528,"B"),(576,"C")]:
         d.line([(x,868),(x,903)],INK,5)
         d.text(x,927,label,20,bold=True,anchor="middle")
-    d.text(850,175,"Build with both supplies unplugged",27,bold=True)
-    lines=["1. Solder the D1 mini headers, or use short wires", "   directly on the labelled pads shown on page 1.", "2. Insert resistors and diodes per page 3. Resistors", "   have no polarity; diode stripes must face H2/H12.", "3. Fit both 2N3904s. Spread leads gently to the holes;", "   keep E, B and C separate. Solder; trim the leads.", "4. Add INSULATED wires on the copper side using", "   the page 4 groups. No stripboard / common rows.", "5. Connect the seven interface wire pads below.", "6. Connect RED to adapter +12 V. Adapter negative,", "   reader BLACK/BROWN and board GND join together.", "7. Heat-shrink BLUE and YELLOW separately. Secure", "   the cable; mount the interface/controller indoors.", "8. Inspect both sides closely for shorts and loose", "   strands. Neither supply is connected yet.", "9. Flash garage-reader.yaml over USB. Then power", "   the reader with 12 V. Keep the common GND wire.", "10. Check Last Frame Bits = 34 and Last Card in HA.", "    Try a notification before enabling gate actions."]
+    d.text(850,175,"Build with adapter and USB unplugged",27,bold=True)
+    lines=["1. Solder the D1 mini headers, or use short wires", "   directly on the labelled pads shown on page 1.", "2. Insert resistors and diodes per page 3. Resistors", "   have no polarity; diode stripes must face H2/H12.", "3. Fit both 2N3904s. Spread leads gently to the holes;", "   keep E, B and C separate. Solder; trim the leads.", "4. Add INSULATED wires on the copper side using", "   the page 4 groups. No stripboard / common rows.", "5. Connect the seven interface wire pads below.", "6. +12 V -> reader RED + converter RED. Negative", "   joins converter BLACK, reader BLACK/BROWN, GND.", "7. Insulate BLUE/YELLOW. Keep controller, converter", "   and interface indoors; secure all cables.", "8. Inspect for shorts. Check actual converter label", "   says 12/24 V input, 5 V output before power-up.", "9. Flash with PC USB; unplug converter USB first.", "   Then swap PC USB for converter USB and power 12 V.", "10. Check Last Frame Bits = 34 and Last Card in HA.", "    Try a notification before enabling gate actions."]
     for i,t in enumerate(lines):d.text(850,215+i*29,t,20)
     d.text(850,809,"Interface pads -> external wires",23,bold=True)
     for i,t in enumerate(["B2 -> board VBUS; V2 -> board 3V3; V18 -> GND", "B6 -> GREEN; B16 -> WHITE", "V6 -> board 5 SCL; V16 -> board 4 SDA"]):d.text(850,847+i*31,t,21)
